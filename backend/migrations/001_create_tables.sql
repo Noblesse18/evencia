@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS users (
   role ENUM('participant', 'organizer', 'admin') DEFAULT 'participant',
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  last_login TIMESTAMP NULL DEFAULT NULL,
   INDEX idx_email (email),
-  INDEX idx_role (role)
+  INDEX idx_role (role),
+  INDEX idx_last_login (last_login)
 );
 
 -- Table Events
