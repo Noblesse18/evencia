@@ -8,7 +8,7 @@ const JWT_EXPIRES_IN = '7d';
 
 async function register(req, res, next) {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role = 'participant' } = req.body;
     
     // Validation des champs requis
     if (!name || !email || !password) {
@@ -31,13 +31,13 @@ async function register(req, res, next) {
     // Génération d'un UUID et insertion du nouvel utilisateur
     const newUserId = uuidv4();
     await pool.execute(
-      'INSERT INTO users (id, name, email, password, createdAt) VALUES (?, ?, ?, ?, NOW())',
-      [newUserId, name, email, password_hash]
+      'INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, NOW())',
+      [newUserId, name, email, password_hash, role]
     );
 
     // Récupération de l'utilisateur créé
     const [users] = await pool.execute(
-      'SELECT id, name, email, createdAt as created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, role, createdAt as created_at FROM users WHERE id = ?',
       [newUserId]
     );
 
@@ -164,4 +164,104 @@ async function verifyToken(req, res, next) {
   }
 }
 
-module.exports = { register, login, verifyToken };
+async function changePassword(req, res, next) {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const { userId } = req.user; // recuperer par authenticateToken
+
+    // 1. recuperer l'utilisateur en base 
+    const [users] = await pool.execute(
+      'SELECT id, password FROM users WHERE id = ?',
+      [userId]
+    );
+    if (user.length === 0){
+      return res.status(404).json({ message: 'utilisateur non trouve' });
+    }
+    const user = users[0];
+
+    // 2 verifier l'ancien mot de passe 
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid){
+      return res.status(401).json({ message: 'Mot de passe actuel incorrect'});
+    }
+
+
+    // 3. Hasher et mettre a jour le mot de passe 
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    await pool.execute(
+      'UPDATE users SET password = ?, updatedAt = NOW() WHERE id = ?',
+      [newPasswordHash, userId]
+    ); 
+
+    // 4. Reponse reussie
+    res.json({
+      message: 'Mot de passe change avec succes. Veuillez vous reconnecter.',
+    });
+  } catch (err) {
+    console.error('Erreur changePassword:', err);
+    next(err);
+  }
+}
+
+// 1. Demande de réinitialisation (envoi du token par email)
+async function requestPasswordReset(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    // Vérifier l'utilisateur
+    const [users] = await pool.execute(
+      'SELECT id FROM users WHERE email = ?',
+      [email]
+    );
+    if (users.length === 0) {
+      return res.json({ message: "Si l'email existe, un lien a été envoyé." });
+    }
+
+    // Générer un token (valide 1h)
+    const token = crypto.randomBytes(20).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1h
+
+    // Sauvegarder en base
+    await pool.execute(
+      'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
+      [token, expires, users[0].id]
+    );
+
+    // [À IMPLEMENTER] Envoyer l'email avec le lien:
+    // ${process.env.FRONTEND_URL}/reset-password?token=${token}
+    console.log(`[DEV] Token généré: ${token} (lien: /reset-password?token=${token})`);
+
+    res.json({ message: "Si l'email existe, un lien a été envoyé." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// 2. Réinitialisation effective (avec token + nouveau mot de passe)
+async function resetPassword(req, res, next) {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Vérifier le token
+    const [users] = await pool.execute(
+      'SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > NOW()',
+      [token]
+    );
+    if (users.length === 0) {
+      return res.status(400).json({ message: "Token invalide ou expiré." });
+    }
+
+    // Hasher et mettre à jour le mot de passe
+    const hash = await bcrypt.hash(newPassword, 10);
+    await pool.execute(
+      'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+      [hash, users[0].id]
+    );
+
+    res.json({ message: "Mot de passe réinitialisé avec succès." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { register, login, changePassword, resetPassword, requestPasswordReset , verifyToken };

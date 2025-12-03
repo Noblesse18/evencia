@@ -1,8 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
-router.post('/register', register);
-router.post('/login', login);
+const {
+    validateRegister,
+    validateLogin,
+    validatePasswordChange,
+    validatePasswordReset
+} = require('../validators/authValidator');
+
+
+// Appliquer les validators avant le controleur
+
+router.post('/register', validateRegister, authController.register);
+router.post('/login', validateLogin, authController.login);
+router.post('/change-password', validatePasswordChange, authController.changePassword);
+//router.post('/reset-password', validatePasswordReset, authController.resetPassword);
+
 
 module.exports = router;
+

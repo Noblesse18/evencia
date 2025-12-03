@@ -1,0 +1,117 @@
+{
+    "info": {
+      "name": "Tests Validators - Event Management",
+      "description": "Tests de validation des entrées"
+    },
+    "item": [
+      {
+        "name": "Auth - Register Valid",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Jean Dupont\",\n  \"email\": \"jean.dupont@example.com\",\n  \"password\": \"Password123\",\n  \"role\": \"participant\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/api/auth/register",
+            "host": ["{{base_url}}"],
+            "path": ["api", "auth", "register"]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status code is not 400', function () {",
+                "    pm.response.to.not.have.status(400);",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Auth - Register Invalid Email",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Jean Dupont\",\n  \"email\": \"email-invalide\",\n  \"password\": \"Password123\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/api/auth/register",
+            "host": ["{{base_url}}"],
+            "path": ["api", "auth", "register"]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status code is 400', function () {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "",
+                "pm.test('Error message contains email validation', function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData.message).to.eql('Erreurs de validation');",
+                "    pm.expect(jsonData.errors).to.be.an('array');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Auth - Register Weak Password",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Jean Dupont\",\n  \"email\": \"jean@example.com\",\n  \"password\": \"faible\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/api/auth/register",
+            "host": ["{{base_url}}"],
+            "path": ["api", "auth", "register"]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Rejects weak password', function () {",
+                "    pm.response.to.have.status(400);",
+                "    var jsonData = pm.response.json();",
+                "    var passwordError = jsonData.errors.find(e => e.field === 'password');",
+                "    pm.expect(passwordError).to.not.be.undefined;",
+                "});"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+  
