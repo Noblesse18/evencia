@@ -1,6 +1,6 @@
 const { mysqlTable, varchar, mysqlEnum, timestamp, unique } = require('drizzle-orm/mysql-core');
 const { users } = require('./userSchema');
-const { event } = require('./eventSchema');
+const { events } = require('./eventSchema');
 
 /**
  * SCHÉMA DE LA TABLE INSCRIPTIONS
@@ -19,7 +19,7 @@ const inscriptions = mysqlTable('inscriptions', {
     .notNull(), 
 
     event_id: varchar('event_id', {length: 36})
-    .references(() => event_id)
+    .references(() => events.id)
     .notNull(), 
 
     // status de l'inscription

@@ -3,12 +3,16 @@ const { pool } = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const JWT_EXPIRES_IN = '7d';
 
 async function register(req, res, next) {
   try {
     const { name, email, password, role = 'participant' } = req.body;
+    
+    // Debug: afficher les données reçues
+    console.log('📝 Register request body:', { name, email, role, hasPassword: !!password });
     
     // Validation des champs requis
     if (!name || !email || !password) {
@@ -31,7 +35,7 @@ async function register(req, res, next) {
     // Génération d'un UUID et insertion du nouvel utilisateur
     const newUserId = uuidv4();
     await pool.execute(
-      'INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, NOW())',
+      'INSERT INTO users (id, name, email, password, role, createdAt) VALUES (?, ?, ?, ?, ?, NOW())',
       [newUserId, name, email, password_hash, role]
     );
 
@@ -105,14 +109,18 @@ async function login(req, res, next) {
       { expiresIn: JWT_EXPIRES_IN }
     );
 
+    const responseUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role || 'participant',
+      created_at: user.createdAt
+    };
+    
+    console.log('🔐 Login response:', { email: user.email, role: user.role, responseRole: responseUser.role });
+    
     res.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role || 'participant',
-        created_at: user.createdAt
-      },
+      user: responseUser,
       token
     });
 
@@ -135,7 +143,7 @@ async function verifyToken(req, res, next) {
     
     // Vérifier que l'utilisateur existe toujours
     const [users] = await pool.execute(
-      'SELECT id, name, email, createdAt as created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, role, createdAt as created_at FROM users WHERE id = ?',
       [decoded.userId]
     );
 
@@ -143,13 +151,21 @@ async function verifyToken(req, res, next) {
       return res.status(401).json({ message: 'Utilisateur introuvable' });
     }
 
+    const user = users[0];
+
     req.user = {
       userId: decoded.userId,
-      role: decoded.role
+      role: user.role
     };
 
     res.json({
-      user: users[0],
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        created_at: user.created_at
+      },
       valid: true
     });
 
@@ -174,13 +190,13 @@ async function changePassword(req, res, next) {
       'SELECT id, password FROM users WHERE id = ?',
       [userId]
     );
-    if (user.length === 0){
+    if (users.length === 0){
       return res.status(404).json({ message: 'utilisateur non trouve' });
     }
     const user = users[0];
 
     // 2 verifier l'ancien mot de passe 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
     if (!isPasswordValid){
       return res.status(401).json({ message: 'Mot de passe actuel incorrect'});
     }

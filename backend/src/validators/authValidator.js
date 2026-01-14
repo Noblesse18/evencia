@@ -30,7 +30,7 @@ const validateRegister = [
         .trim()
         .notEmpty().withMessage('le nom est requis')
         .isLength({ min: 2, max: 100 }).withMessage('le nom doit contenir entre 2 et 100 caracteres')
-        .matches(/^[a-zA-ZÀ-ÿ\s'-]+$]/).withMessage('le nom contient des caracteres invalides'),
+        .matches(/^[a-zA-ZÀ-ÿ\s'-]+$/).withMessage('le nom contient des caracteres invalides'),
     
     // validation de l'email
     body('email')

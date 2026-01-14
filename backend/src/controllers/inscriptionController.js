@@ -8,8 +8,21 @@ async function createInscription(req, res, next) {
     const user_id = req.user.userId;
     if (!event_id) return res.status(400).json({ message: 'event_id requis' });
 
-    const [evRows] = await pool.execute('SELECT id FROM events WHERE id = ?', [event_id]);
+    // Vérifier que l'événement existe
+    const [evRows] = await pool.execute('SELECT id, max_tickets FROM events WHERE id = ?', [event_id]);
     if (!evRows.length) return res.status(404).json({ message: 'Événement introuvable' });
+
+    // Vérifier s'il reste des places
+    const event = evRows[0];
+    if (event.max_tickets) {
+      const [countResult] = await pool.execute(
+        'SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = "confirmed"',
+        [event_id]
+      );
+      if (countResult[0].count >= event.max_tickets) {
+        return res.status(400).json({ message: 'Plus de places disponibles' });
+      }
+    }
 
     const newInscriptionId = uuidv4();
     await pool.execute(
@@ -22,6 +35,30 @@ async function createInscription(req, res, next) {
     if (err && err.errno === 1062) return res.status(400).json({ message: 'Déjà inscrit' });
     next(err);
   }
+}
+
+// Obtenir l'historique des inscriptions de l'utilisateur connecté
+async function getMyInscriptions(req, res, next) {
+  try {
+    const user_id = req.user.userId;
+    
+    const [rows] = await pool.execute(`
+      SELECT i.*, 
+        e.title as event_title, 
+        e.description as event_description,
+        e.location as event_location,
+        e.event_date,
+        e.price as event_price,
+        e.category as event_category,
+        e.image_url as event_image_url
+      FROM inscriptions i
+      JOIN events e ON i.event_id = e.id
+      WHERE i.user_id = ?
+      ORDER BY i.createdAt DESC
+    `, [user_id]);
+    
+    res.json(rows);
+  } catch (err) { next(err); }
 }
 
 async function cancelInscription(req, res, next) {
@@ -39,4 +76,4 @@ async function cancelInscription(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { createInscription, cancelInscription };
+module.exports = { createInscription, cancelInscription, getMyInscriptions };

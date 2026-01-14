@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { authenticateToken } = require('../middleware/auth');
 
 const {
     validateRegister,
@@ -14,8 +15,10 @@ const {
 
 router.post('/register', validateRegister, authController.register);
 router.post('/login', validateLogin, authController.login);
-router.post('/change-password', validatePasswordChange, authController.changePassword);
-//router.post('/reset-password', validatePasswordReset, authController.resetPassword);
+router.post('/change-password', authenticateToken, validatePasswordChange, authController.changePassword);
+router.post('/request-password-reset', authController.requestPasswordReset);
+router.post('/reset-password', validatePasswordReset, authController.resetPassword);
+router.get('/verify', authController.verifyToken);
 
 
 module.exports = router;
