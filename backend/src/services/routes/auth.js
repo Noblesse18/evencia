@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const { authenticateToken } = require('../middleware/auth');
+const authController = require('../../controllers/authController');
+const { authenticateToken } = require('../../middleware/auth');
 
 const {
     validateRegister,
     validateLogin,
     validatePasswordChange,
     validatePasswordReset
-} = require('../validators/authValidator');
+} = require('../../validators/authValidator');
 
 
 // Appliquer les validators avant le controleur

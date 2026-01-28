@@ -51,7 +51,7 @@ const validateRegister = [
     // validation du mot de passe 
     body('password')
         .notEmpty().withMessage('le mot de passe est requis')
-        .isLength({ min: 8 }).withMessage('le mot de passe doit contenir au moins 8 caracteres')
+        .isLength({ min: 12 }).withMessage('le mot de passe doit contenir au moins 12 caracteres')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage(
             'le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
         )
@@ -97,7 +97,7 @@ const validatePasswordChange = [
 
     body('newPassword')
         .notEmpty().withMessage('Le nouveau mot de passe est requis')
-        .isLength({ min: 8}).withMessage('le mot de passe doit contenir au moins 8 caracteres')
+        .isLength({ min: 12}).withMessage('le mot de passe doit contenir au moins 12 caracteres')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage(
             'le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'
         )

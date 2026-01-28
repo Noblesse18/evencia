@@ -11,8 +11,6 @@ async function register(req, res, next) {
   try {
     const { name, email, password, role = 'participant' } = req.body;
     
-    // Debug: afficher les données reçues
-    console.log('📝 Register request body:', { name, email, role, hasPassword: !!password });
     
     // Validation des champs requis
     if (!name || !email || !password) {

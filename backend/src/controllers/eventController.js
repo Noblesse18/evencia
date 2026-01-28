@@ -1,6 +1,8 @@
 // src/controllers/eventController.js
 const { pool } = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
+const { EventRepository, InscriptionRepository, eventRepository, inscriptionRepository} = require('../repositories');
+
 
 // Liste des catégories disponibles
 const CATEGORIES = [
@@ -114,57 +116,55 @@ async function listEvents(req, res, next) {
 async function getEvent(req, res, next) {
   try {
     const { id } = req.params;
-    const [rows] = await pool.execute('SELECT * FROM events WHERE id = ?', [id]);
-    if (!rows.length) return res.status(404).json({ message: 'Événement introuvable' });
     
-    // Récupérer le nombre de participants (inscriptions confirmées)
-    const [countResult] = await pool.execute(
-      'SELECT COUNT(*) as participants_count FROM inscriptions WHERE event_id = ? AND status = "confirmed"',
-      [id]
-    );
+    const event = await eventRepository.findAll(id);
+
+    if (!event) {
+      return res.status(404).json({ message : 'Evenement introuvable' });
+    }
+
+    // Recuperer le nombre de participants
+    const participantsCount = await inscriptionRepository.countByEventId(id);
+
+    // Calculer les tickets restants 
+    const ticketsRemaining = event.max_tickets
+      ? event.max_tickets - participantsCount
+      : null;
     
-    // Calculer les tickets restants
-    const participants_count = countResult[0].participants_count || 0;
-    const max_tickets = rows[0].max_tickets;
-    const tickets_remaining = max_tickets ? max_tickets - participants_count : null;
-    
-    const event = {
-      ...rows[0],
-      participants_count,
-      tickets_remaining
-    };
-    
-    res.json(event);
-  } catch (err) { next(err); }
+    res.json({
+      ...events,
+      participants_count: participantsCount,
+      tickets_remaining: ticketsRemaining
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function createEvent(req, res, next) {
   try {
     const { title, description, category, location, event_date, price, max_tickets, image_url, photos } = req.body;
     const organizer_id = req.user.userId;
-    const newEventId = uuidv4();
     
-    await pool.execute(
-      `INSERT INTO events (id, title, description, category, location, event_date, price, max_tickets, organizer_id, image_url, photos) 
-       VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
-      [
-        newEventId, 
-        title, 
-        description, 
-        category || 'autre',
-        location, 
-        event_date || null, 
-        price || 0, 
-        max_tickets || null,
-        organizer_id, 
-        image_url || null,
-        photos ? JSON.stringify(photos) : null
-      ]
-    );
-    const [rows] = await pool.execute('SELECT * FROM events WHERE id = ?', [newEventId]);
-    res.status(201).json(rows[0]);
-  } catch (err) { next(err); }
+    const newEvent = await eventRepository.createEvent({
+      title, 
+      description, 
+      category: category || 'autre',
+      location, 
+      event_date: event_date || null, 
+      price:  price || 0, 
+      max_tickets: max_tickets || null,
+      organizer_id, 
+      image_url: image_url || null,
+      photos : photos || null
+    });
+
+    res.stats(201).json(newEvent);
+  } catch (err) {
+    next(err);
+  }
 }
+
 
 async function updateEvent(req, res, next) {
   try {

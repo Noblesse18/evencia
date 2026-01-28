@@ -24,10 +24,13 @@ class EventRepository extends BaseRepository {
             id: eventId,
             title: eventData.title.trim(),
             description: eventData.description?.trim(),
+            category: eventData.category || 'autre',      // Ajouté
             location: eventData.location?.trim(),
             event_date: eventData.event_date,
             price: eventData.price || 0,
+            max_tickets: eventData.max_tickets || null,
             organizer_id: eventData.organizer_id,
+            image_url: eventData.image_url || null,
             photos: eventData.photos ? JSON.stringify(eventData.photos) : null
         };
 
@@ -54,9 +57,14 @@ class EventRepository extends BaseRepository {
                 id: this.table.id,
                 title: this.table.title,
                 description: this.table.description,
+                category: this.table.category,           // Ajouté
                 location: this.table.location,
                 event_date: this.table.event_date,
                 price: this.table.price,
+                max_tickets: this.table.max_tickets,
+                organizer_id: this.table.organizer_id,   // Ajouté
+                image_url: this.table.image_url,         // Ajouté
+                photos: this.table.photos,               // Ajouté
                 createdAt: this.table.createdAt,
                 // Informations de l'organisateur
                 organizer: {
@@ -74,6 +82,11 @@ class EventRepository extends BaseRepository {
         // appliquer les filtres
         const conditions = [];
 
+        // Filtre par catégorie
+        if (filters.category && filters.category !== 'all') {
+            conditions.push(eq(this.table.category, filters.category));
+        }
+
         // filtre par date de debut
         if (filters.startDate) {
             conditions.push(gte(this.table.event_date, new Date(filters.startDate)));
@@ -84,22 +97,33 @@ class EventRepository extends BaseRepository {
             conditions.push(lte(this.table.event_date, new Date(filters.endDate)));
         }
 
-        // filtre par lieu
+        // filtre par lieu (ville)
         if (filters.location) {
             conditions.push(like(this.table.location, `%${filters.location}%`));
-          }
+        }
           
-          // Filtre par prix minimum
+        // Filtre par prix minimum
         if (filters.minPrice !== undefined) {
             conditions.push(gte(this.table.price, filters.minPrice));
         }
           
-          // Filtre par prix maximum
+        // Filtre par prix maximum
         if (filters.maxPrice !== undefined) {
             conditions.push(lte(this.table.price, filters.maxPrice));
-         }
+        }
+
+        // Recherche par titre ou description
+        if (filters.search) {
+            const searchTerm = `%${filters.search}%`;
+            conditions.push(
+                or(
+                    like(this.table.title, searchTerm),
+                    like(this.table.description, searchTerm)
+                )
+            );
+        }
           
-          // Appliquer les conditions
+        // Appliquer les conditions
         if (conditions.length > 0) {
             query = query.where(and(...conditions));
         }

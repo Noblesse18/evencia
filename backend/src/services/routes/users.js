@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserById, getMyProfile, updateMyProfile } = require('../controllers/userController');
-const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+const { getAllUsers, getUserById, getMyProfile, updateMyProfile } = require('../../controllers/userController');
+const { authenticateToken, authorizeRoles } = require('../../middleware/auth');
 
 // Routes pour l'utilisateur connecté
 router.get('/me', authenticateToken, getMyProfile);

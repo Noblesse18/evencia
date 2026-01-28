@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { listEvents, getEvent, createEvent, updateEvent, deleteEvent, getCategories, getOrganizerEvents } = require('../controllers/eventController');
-const { authenticateToken, authorizeRoles } = require('../middleware/auth');
+const { listEvents, getEvent, createEvent, updateEvent, deleteEvent, getCategories, getOrganizerEvents } = require('../../controllers/eventController');
+const { authenticateToken, authorizeRoles } = require('../../middleware/auth');
 
 // Routes publiques (statiques d'abord)
 router.get('/categories', getCategories);
