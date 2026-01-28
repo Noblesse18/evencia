@@ -49,6 +49,17 @@ const globalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiter strict pour l'authentification - 5 tentatives par minute
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // 5 tentatives max
+  message: {
+    message: 'Trop de tentatives de connexion, veuillez réessayer dans 1 minute'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Appliquer le rate limiter global
 app.use(globalLimiter);
 
