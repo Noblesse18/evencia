@@ -1,7 +1,7 @@
 // src/controllers/eventController.js
 const { pool } = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
-const { EventRepository, InscriptionRepository, eventRepository, inscriptionRepository} = require('../repositories');
+const { eventRepository, inscriptionRepository, userRepository } = require('../repositories');
 
 
 // Liste des catégories disponibles
@@ -117,24 +117,34 @@ async function getEvent(req, res, next) {
   try {
     const { id } = req.params;
     
-    const event = await eventRepository.findAll(id);
+    const event = await eventRepository.findById(id);
 
     if (!event) {
       return res.status(404).json({ message : 'Evenement introuvable' });
     }
 
-    // Recuperer le nombre de participants
+    // Récupérer le nombre de participants
     const participantsCount = await inscriptionRepository.countByEventId(id);
 
     // Calculer les tickets restants 
     const ticketsRemaining = event.max_tickets
       ? event.max_tickets - participantsCount
       : null;
+
+    // Récupérer les infos de l'organisateur (nom, email)
+    let organizer = null;
+    if (event.organizer_id) {
+      const org = await userRepository.findById(event.organizer_id);
+      if (org) {
+        organizer = { id: org.id, name: org.name, email: org.email };
+      }
+    }
     
     res.json({
       ...events,
       participants_count: participantsCount,
-      tickets_remaining: ticketsRemaining
+      tickets_remaining: ticketsRemaining,
+      organizer
     });
   } catch (err) {
     next(err);

@@ -383,22 +383,29 @@ export default function EventDetailPage({ params }: PageProps) {
 
               <hr className="my-6 border-slate-200 dark:border-slate-700" />
 
-              {/* Organizer */}
+              {/* Organisateur */}
               <div>
                 <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
                   Organisateur
                 </h4>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-semibold">
-                    <User className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-semibold text-sm">
+                    {event.organizer?.name?.charAt(0).toUpperCase() ?? '?'}
                   </div>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-white">
-                      Organisateur
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900 dark:text-white truncate">
+                      {event.organizer?.name ?? 'Organisateur'}
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Membre Evencia
-                    </p>
+                    {event.organizer?.email && (
+                      <p className="text-sm text-slate-500 dark:text-slate-400 truncate" title={event.organizer.email}>
+                        {event.organizer.email}
+                      </p>
+                    )}
+                    {!event.organizer && (
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Membre Evencia
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

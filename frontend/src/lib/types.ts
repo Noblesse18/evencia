@@ -6,6 +6,12 @@ export interface User {
   created_at: string;
 }
 
+export interface EventOrganizer {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -16,6 +22,7 @@ export interface Event {
   price: number;
   max_tickets: number | null;
   organizer_id: string;
+  organizer?: EventOrganizer | null;
   photos: string[] | null;
   image_url: string | null;
   participants_count: number;

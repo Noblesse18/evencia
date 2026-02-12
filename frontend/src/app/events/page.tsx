@@ -102,14 +102,15 @@ function EventsPageContent() {
     fetchEvents(1);
   }, []);
 
-  const fetchEvents = async (page: number) => {
+  const fetchEvents = async (page: number, categoryOverride?: string) => {
     setIsLoading(true);
+    const category = categoryOverride !== undefined ? categoryOverride : filters.category;
     try {
       const response = await eventsAPI.getAll({
         page,
         limit: pagination.limit,
         search: filters.search || undefined,
-        category: filters.category !== 'all' ? filters.category : undefined,
+        category: category !== 'all' ? category : undefined,
         city: filters.city || undefined,
         price_min: filters.price_min ? parseFloat(filters.price_min) : undefined,
         price_max: filters.price_max ? parseFloat(filters.price_max) : undefined,
@@ -328,7 +329,7 @@ function EventsPageContent() {
                 key={cat.id}
                 onClick={() => {
                   handleFilterChange('category', cat.id);
-                  setTimeout(() => fetchEvents(1), 0);
+                  fetchEvents(1, cat.id);
                 }}
                 className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
                   filters.category === cat.id

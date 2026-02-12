@@ -14,9 +14,6 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Debug: afficher le rôle de l'utilisateur
-  console.log('🔍 Navbar - User:', user?.email, 'Role:', user?.role, 'isAuthenticated:', isAuthenticated);
-
   const isOrganizer = user?.role === 'organizer' || user?.role === 'admin';
 
   const navLinks = [
