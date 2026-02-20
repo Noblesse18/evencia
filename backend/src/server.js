@@ -31,9 +31,9 @@ const corsOptions = {
       callback(new Error('Non autoriser par CORS'));
     }
   },
-  Credentials: true, // Autoriser les cookies
+  credentials: true, // Autoriser les cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorizations'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 const PORT = process.env.PORT || 5000;

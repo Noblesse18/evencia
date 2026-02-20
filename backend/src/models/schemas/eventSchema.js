@@ -34,7 +34,7 @@ const events = mysqlTable('events', {
 
     // Dates de creation et modification
     createdAt: timestamp('createdAt').defaultNow(),
-    updateAt: timestamp('updatedAt').defaultNow().onUpdateNow(),
+    updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow(),
     
 });
 

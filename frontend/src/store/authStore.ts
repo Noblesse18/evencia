@@ -62,7 +62,7 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-          set({ isAuthenticated: false, user: null });
+          set({ isAuthenticated: false, user: null, token: null });
           return;
         }
 
@@ -75,9 +75,14 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             token 
           });
-        } catch {
-          localStorage.removeItem('token');
-          set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+        } catch (err: unknown) {
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          if (status === 401) {
+            localStorage.removeItem('token');
+            set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+          } else {
+            set({ isLoading: false });
+          }
         }
       },
 
@@ -85,7 +90,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, token: state.token }),
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

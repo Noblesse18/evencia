@@ -141,7 +141,7 @@ async function getEvent(req, res, next) {
     }
     
     res.json({
-      ...events,
+      ...event,
       participants_count: participantsCount,
       tickets_remaining: ticketsRemaining,
       organizer
@@ -169,7 +169,7 @@ async function createEvent(req, res, next) {
       photos : photos || null
     });
 
-    res.stats(201).json(newEvent);
+    res.status(201).json(newEvent);
   } catch (err) {
     next(err);
   }

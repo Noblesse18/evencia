@@ -224,6 +224,26 @@ class InscriptionRepository extends BaseRepository {
   }
 
   /**
+   * COMPTER LES INSCRIPTIONS CONFIRMÉES POUR UN ÉVÉNEMENT (participants)
+   */
+  async countByEventId(eventId) {
+    try {
+      const result = await this.db
+        .select({ count: sql`COUNT(*)` })
+        .from(this.table)
+        .where(
+          and(
+            eq(this.table.event_id, eventId),
+            eq(this.table.status, 'confirmed')
+          )
+        );
+      return parseInt(result[0]?.count ?? 0, 10);
+    } catch (error) {
+      throw new Error(`Erreur countByEventId: ${error.message}`);
+    }
+  }
+
+  /**
    * COMPTER LES INSCRIPTIONS PAR STATUT POUR UN ÉVÉNEMENT
    */
   async countByEventAndStatus(eventId) {
