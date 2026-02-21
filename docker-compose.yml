@@ -40,6 +40,8 @@ services:
       - DB_NAME=${DB_NAME:-evencianew}
       - JWT_SECRET=${JWT_SECRET:-d230c3c3ae2d1c7d218459498ceebbd7}
       - PORT=5000
+      - NODE_ENV=development
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5000,http://127.0.0.1:3000,http://127.0.0.1:5000}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
     depends_on:
       mysql:
