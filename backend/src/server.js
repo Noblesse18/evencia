@@ -2,6 +2,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./config/swagger');
 const { pool } = require('./config/db');
 const rateLimit = require('express-rate-limit'); 
 const authRoutes = require('./services/routes/auth');
@@ -71,6 +73,11 @@ app.use('/api/auth/reset-password', authLimiter);
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Documentation Swagger (OpenAPI)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customSiteTitle: 'API Evencia - Documentation',
+}));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
@@ -90,6 +97,6 @@ app.listen(PORT, async () => {
     conn.release();
     console.log('Connected to MySQL');
   } catch (err) {
-    console.error('MySQL connection error:', err.message);
+    console.error('MySQL connection error:', err.message || err.code || err);
   }
 });
