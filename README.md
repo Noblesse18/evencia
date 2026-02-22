@@ -296,6 +296,7 @@ api.interceptors.request.use((config) => { ... });
 5. **Documentation API Swagger** sur `/api-docs` pour tester l’API
 6. **Validation robuste** avec express-validator
 7. **State management** avec Zustand et persistence
+8. **Audit qualité React** : score **93/100** avec React Doctor sur le frontend
 
 ---
 
@@ -335,6 +336,16 @@ api.interceptors.request.use((config) => { ... });
 ### DevOps
 - **Docker** - Conteneurisation
 - **Docker Compose** - Orchestration
+
+### Qualité du code : React Doctor
+
+Le frontend a été audité avec **[React Doctor](https://github.com/millionco/react-doctor)** (outil d’analyse des bonnes pratiques React : dead code, linting, performance, accessibilité, etc.).
+
+| Projet   | Score obtenu |
+|----------|----------------|
+| **Frontend (Next.js)** | **93 / 100** |
+
+Commande utilisée : `npx react-doctor@latest .` (à exécuter depuis le dossier `frontend/`).
 
 ---
 
