@@ -14,6 +14,117 @@
 
 ---
 
+## 📖 Documentation API (Swagger)
+
+L’API est documentée avec **Swagger / OpenAPI 3.0**. Vous pouvez explorer et tester tous les endpoints depuis l’interface web.
+
+### Accès à Swagger
+
+| Contexte | URL |
+|----------|-----|
+| **Backend en local** (`npm run dev` dans `backend/`) | [http://localhost:5000/api-docs](http://localhost:5000/api-docs) |
+| **Backend via Docker** (`docker compose up`) | [http://localhost:5000/api-docs](http://localhost:5000/api-docs) |
+
+### Utilisation
+
+1. Ouvrir l’URL dans un navigateur.
+2. Pour tester les routes protégées : exécuter **POST /api/auth/login** avec un body `{ "email": "...", "password": "..." }`, copier le `token` dans la réponse.
+3. Cliquer sur **Authorize**, saisir `Bearer <votre_token>` (ou uniquement le token selon l’interface), puis valider.
+4. Les requêtes suivantes enverront automatiquement le header `Authorization`.
+
+Les sections documentées : **Auth**, **Users**, **Events**, **Inscriptions**, **Payments**.
+
+---
+
+## 📂 Documentation projet (TPs et guides)
+
+| Document | Description |
+|----------|-------------|
+| `docs/TP-Mobile-React-Native-Expo-Evencia.md` | Application mobile Expo et connexion à l’API |
+| `docs/TP-Deploiement-Evencia.md` | Exposition via tunnel (ngrok/Cloudflare) et déploiement sur serveur Linux |
+| `docs/TP-Stripe-Evencia.md` | Mise en place de Stripe (clés, backend, test API, optionnel frontend et webhooks) |
+
+---
+
+## 🚀 Installation et lancement en local
+
+### Prérequis
+
+- **Node.js** 18 ou 20 (LTS)
+- **npm** (ou yarn)
+- **MySQL** 8 (ou MariaDB) installé et démarré sur la machine
+
+### 1. Base de données MySQL
+
+- Démarrer le service MySQL (`sudo systemctl start mysql` sous Linux).
+- Créer la base et un utilisateur (ex. dans le client MySQL) :
+  ```sql
+  CREATE DATABASE IF NOT EXISTS evencianew CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  -- Optionnel : CREATE USER 'evencia'@'localhost' IDENTIFIED BY 'mot_de_passe';
+  -- GRANT ALL ON evencianew.* TO 'evencia'@'localhost'; FLUSH PRIVILEGES;
+  ```
+
+### 2. Backend (API)
+
+```bash
+cd backend
+npm install
+```
+
+- Créer le fichier **`.env`** à la racine de `backend/` (copier depuis **`env.example`** si présent).
+- Renseigner au minimum :
+  - `DB_HOST=localhost`
+  - `DB_PORT=3306`
+  - `DB_USER=root` (ou l’utilisateur créé)
+  - `DB_PASSWORD=votre_mot_de_passe`
+  - `DB_NAME=evencianew`
+  - `JWT_SECRET=une_chaîne_longue_et_aléatoire` (ex. `openssl rand -hex 32`)
+  - `PORT=5000`
+  - `CORS_ORIGINS=http://localhost:3000,http://localhost:5000`
+
+Puis :
+
+```bash
+npm run migrate
+npm run seed
+npm run dev
+```
+
+L’API est disponible sur **http://localhost:5000**. La doc Swagger : **http://localhost:5000/api-docs**.
+
+### 3. Frontend (Next.js)
+
+Dans un **autre terminal** :
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Le site est accessible sur **http://localhost:3000**. Par défaut, le frontend appelle l’API sur `http://localhost:5000/api`. Pour changer l’URL (ex. autre machine) : créer **`frontend/.env.local`** avec `NEXT_PUBLIC_API_URL=http://...`.
+
+### 4. Récapitulatif
+
+| Service   | URL locale              |
+|----------|--------------------------|
+| Frontend | http://localhost:3000    |
+| Backend  | http://localhost:5000   |
+| Swagger  | http://localhost:5000/api-docs |
+
+### Alternative : tout lancer avec Docker
+
+À la racine du projet :
+
+```bash
+docker compose up --build -d
+```
+
+ou, si un Makefile est fourni : `make up-build`.  
+Frontend : **http://localhost:3000**, Backend : **http://localhost:5000**, Swagger : **http://localhost:5000/api-docs**. La base MySQL tourne dans un conteneur ; les variables d’environnement sont définies dans `docker-compose.yml`.
+
+---
+
 ## 1. 🔍 FONCTIONNEMENT GLOBAL
 
 ### ✅ Points positifs
@@ -70,7 +181,7 @@
 |--------------|------------------------|
 | Ajouter des tests unitaires | Démontre la maîtrise des tests (Jest disponible) |
 | Créer la page `/forgot-password` | Complète le parcours utilisateur |
-| Documenter l'API avec Swagger | Valorise la documentation technique |
+| ~~Documenter l'API avec Swagger~~ | ✅ **Fait** – accessible sur `/api-docs` |
 | Ajouter validators pour events | Cohérence avec authValidator.js |
 
 ### Moyen terme (valorisation du dossier)
@@ -181,9 +292,10 @@ api.interceptors.request.use((config) => { ... });
 1. **Architecture fullstack moderne** (Next.js 16 + Express + MySQL + Drizzle)
 2. **Gestion des rôles** avec middleware d'autorisation
 3. **UI/UX professionnelle** avec Tailwind + Framer Motion
-4. **Docker-compose** pour le déploiement
-5. **Validation robuste** avec express-validator
-6. **State management** avec Zustand et persistence
+4. **Docker-compose** pour le déploiement (CORS configuré pour frontend et Swagger)
+5. **Documentation API Swagger** sur `/api-docs` pour tester l’API
+6. **Validation robuste** avec express-validator
+7. **State management** avec Zustand et persistence
 
 ---
 
@@ -191,7 +303,7 @@ api.interceptors.request.use((config) => { ... });
 
 - [ ] Supprimer les secrets du code versionné
 - [ ] Ajouter 5-10 tests unitaires basiques
-- [ ] Créer une documentation Swagger/OpenAPI
+- [x] Créer une documentation Swagger/OpenAPI (voir section « Documentation API » ci-dessus)
 - [ ] Compléter le parcours reset password (frontend)
 - [ ] Nettoyer le code de debug (console.log)
 - [ ] Ajouter validators pour les événements
@@ -217,7 +329,8 @@ api.interceptors.request.use((config) => { ... });
 - **JWT** - Authentification
 - **bcrypt** - Hashage des mots de passe
 - **express-validator** - Validation des données
-- **Stripe** - Paiements (partiellement implémenté)
+- **Swagger / OpenAPI 3** - Documentation interactive de l’API (`/api-docs`)
+- **Stripe** - Paiements (Payment Intents ; voir `docs/TP-Stripe-Evencia.md`)
 
 ### DevOps
 - **Docker** - Conteneurisation
@@ -234,7 +347,7 @@ api.interceptors.request.use((config) => { ... });
 | **Développer des composants d'accès aux données** | Drizzle ORM, requêtes MySQL |
 | **Intégrer des composants applicatifs** | Frontend/Backend, authentification |
 | **Tester une solution applicative** | Validation, gestion d'erreurs |
-| **Documenter une solution applicative** | Commentaires, types TypeScript |
+| **Documenter une solution applicative** | Commentaires, types TypeScript, **Swagger/OpenAPI** |
 
 ---
 
