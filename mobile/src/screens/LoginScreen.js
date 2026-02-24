@@ -1,92 +1,88 @@
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    KeyboardAvoidingView,
-    Platform,
-    ActivityIndicator,
-    Alert,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import {useAuth} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
-export default function LoginScreen(){
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const {login} = useAuth();
+  const { login } = useAuth();
 
-    const handleLogin = async () => {
-        if (!email.trim() || !password) {
-            setError('Veuillez remplir email et mot de passe.');
-            return;
-        }
-        setError('');
-        setLoading(true);
-        try {
-            await login(email.trim(), password);
-        } catch (err) {
-            const message = err.response?.data?.message || 
-            'Erreur de connexion. Verifiez vos identifiants.';
-            setError(message);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setError('Veuillez remplir email et mot de passe.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      await login(email.trim(), password);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Erreur de connexion. Vérifiez vos identifiants.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={StyleSheet.container}
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <View style={styles.form}>
+        <Text style={styles.title}>Connexion</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#999"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          editable={!loading}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Mot de passe"
+          placeholderTextColor="#999"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          editable={!loading}
+        />
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
         >
-            <View style={StyleSheet.form}>
-                <Text style={StyleSheet.title}>connexion</Text>
-                {/* Champ email : valeur controler par l'etat email */}
-                <TextIput
-                    style={style.input}
-                    placeholder="Email"
-                    placeholderTextColor="#999"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    editable={!loading}
-                />
-                
-                <TextInput
-                    style={StyleSheet.input}
-                    placeholder="Mot de passe"
-                    placeholderTextColor="#999"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    editable={!loading}
-                />
-                {/* Message d'erreur affiché sous les champs  */}
-
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-                {/* Bouton : désactivé pendant le chargement, affiche un indicateur si loading*/}
-
-                <TouchableOpacity
-                    style={[styles.button, loading && styles.buttonDisabled]}
-                    onPress={handleLogin}
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <ActivityIndicator color="#fff" />
-                    ) : (
-                        <Text style={styles.buttonText}>Se connecter</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
-    );
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Se connecter</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
