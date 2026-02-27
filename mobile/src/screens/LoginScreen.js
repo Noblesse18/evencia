@@ -4,12 +4,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
@@ -17,7 +16,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
   const handleLogin = async () => {
@@ -40,99 +39,78 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      className="flex-1 bg-slate-50"
     >
-      <View style={styles.form}>
-        <Text style={styles.title}>Connexion</Text>
+      <View className="flex-1 justify-center px-6">
+        {/* Logo */}
+        <View className="items-center mb-8">
+          <View className="w-16 h-16 bg-amber-500 rounded-2xl items-center justify-center mb-3">
+            <Ionicons name="calendar" size={32} color="#fff" />
+          </View>
+          <Text className="text-3xl font-bold text-slate-900">Evencia</Text>
+          <Text className="text-slate-500 text-sm mt-1">Connectez-vous à votre compte</Text>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!loading}
-        />
+        {/* Form */}
+        <View className="bg-white rounded-2xl p-6 shadow-sm">
+          {/* Email */}
+          <Text className="text-sm font-medium text-slate-700 mb-1">Email</Text>
+          <View className="flex-row items-center bg-slate-50 rounded-xl px-3 py-2.5 mb-4 border border-slate-200">
+            <Ionicons name="mail-outline" size={18} color="#94a3b8" />
+            <TextInput
+              className="flex-1 ml-2 text-base text-slate-900"
+              placeholder="votre@email.com"
+              placeholderTextColor="#94a3b8"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading}
+            />
+          </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Mot de passe"
-          placeholderTextColor="#999"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          editable={!loading}
-        />
+          {/* Password */}
+          <Text className="text-sm font-medium text-slate-700 mb-1">Mot de passe</Text>
+          <View className="flex-row items-center bg-slate-50 rounded-xl px-3 py-2.5 mb-4 border border-slate-200">
+            <Ionicons name="lock-closed-outline" size={18} color="#94a3b8" />
+            <TextInput
+              className="flex-1 ml-2 text-base text-slate-900"
+              placeholder="••••••••"
+              placeholderTextColor="#94a3b8"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              editable={!loading}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={18} color="#94a3b8" />
+            </TouchableOpacity>
+          </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {/* Error */}
+          {error ? (
+            <View className="bg-red-50 rounded-xl px-3 py-2 mb-4 flex-row items-center">
+              <Ionicons name="alert-circle" size={16} color="#ef4444" />
+              <Text className="text-red-600 text-sm ml-2 flex-1">{error}</Text>
+            </View>
+          ) : null}
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Se connecter</Text>
-          )}
-        </TouchableOpacity>
+          {/* Button */}
+          <TouchableOpacity
+            className={`bg-amber-500 rounded-xl py-4 items-center ${loading ? 'opacity-70' : ''}`}
+            onPress={handleLogin}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-white text-base font-semibold">Se connecter</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#f5f5f5',
-  },
-  form: {
-    backgroundColor: '#fff',
-    padding: 24,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  errorText: {
-    color: '#c00',
-    marginBottom: 12,
-    fontSize: 14,
-  },
-  button: {
-    backgroundColor: '#2563eb',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
