@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
+    "android": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:5000 tcp:5000 && expo start --localhost --android --clear",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },

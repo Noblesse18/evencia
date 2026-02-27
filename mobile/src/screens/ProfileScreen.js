@@ -38,7 +38,7 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
@@ -50,37 +50,33 @@ export default function ProfileScreen() {
     : '';
 
   const roleBadge = {
-    admin: { label: 'Administrateur', color: '#ef4444', bg: '#fef2f2' },
-    organizer: { label: 'Organisateur', color: '#f59e0b', bg: '#fffbeb' },
-    participant: { label: 'Participant', color: '#3b82f6', bg: '#eff6ff' },
+    admin: { label: 'Administrateur', color: '#ef4444' },
+    organizer: { label: 'Organisateur', color: '#f59e0b' },
+    participant: { label: 'Participant', color: '#3b82f6' },
   };
 
   const role = roleBadge[data?.role] || roleBadge.participant;
 
   return (
-    <ScrollView className="flex-1 bg-slate-50" contentContainerStyle={{ paddingBottom: 32 }}>
+    <ScrollView className="flex-1" style={{ backgroundColor: '#0a0a0f' }} contentContainerStyle={{ paddingBottom: 32 }}>
       {/* Header */}
       <View className="bg-amber-500 px-6 pt-14 pb-12 items-center rounded-b-3xl">
-        <View className="w-20 h-20 rounded-full bg-white/20 items-center justify-center mb-3">
+        <View className="w-20 h-20 rounded-full items-center justify-center mb-3" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
           <Text className="text-3xl font-bold text-white">
             {(data?.name || '?').charAt(0).toUpperCase()}
           </Text>
         </View>
         <Text className="text-white text-xl font-bold">{data?.name || 'Utilisateur'}</Text>
         <Text className="text-amber-100 text-sm mt-1">{data?.email}</Text>
-        <View
-          className="mt-3 px-3 py-1 rounded-full"
-          style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-        >
+        <View className="mt-3 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
           <Text className="text-white text-xs font-medium">{role.label}</Text>
         </View>
       </View>
 
       {/* Infos */}
       <View className="px-4 mt-6">
-        <Text className="text-lg font-bold text-slate-900 mb-3">Informations</Text>
-
-        <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <Text className="text-lg font-bold text-white mb-3">Informations</Text>
+        <View className="rounded-2xl overflow-hidden" style={{ backgroundColor: '#0f172a' }}>
           <ProfileRow icon="person-outline" label="Nom" value={data?.name} />
           <ProfileRow icon="mail-outline" label="Email" value={data?.email} />
           <ProfileRow icon="shield-outline" label="Rôle" value={role.label} valueColor={role.color} />
@@ -92,9 +88,8 @@ export default function ProfileScreen() {
 
       {/* Actions */}
       <View className="px-4 mt-6">
-        <Text className="text-lg font-bold text-slate-900 mb-3">Paramètres</Text>
-
-        <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <Text className="text-lg font-bold text-white mb-3">Paramètres</Text>
+        <View className="rounded-2xl overflow-hidden" style={{ backgroundColor: '#0f172a' }}>
           <ActionRow icon="notifications-outline" label="Notifications" />
           <ActionRow icon="lock-closed-outline" label="Confidentialité" />
           <ActionRow icon="help-circle-outline" label="Aide & support" isLast />
@@ -104,7 +99,8 @@ export default function ProfileScreen() {
       {/* Déconnexion */}
       <View className="px-4 mt-6">
         <TouchableOpacity
-          className="bg-red-50 rounded-2xl p-4 flex-row items-center justify-center"
+          className="rounded-2xl p-4 flex-row items-center justify-center"
+          style={{ backgroundColor: '#1c1917' }}
           onPress={handleLogout}
           activeOpacity={0.8}
         >
@@ -113,17 +109,17 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text className="text-center text-xs text-slate-400 mt-6">Evencia Mobile v1.0.0</Text>
+      <Text className="text-center text-xs text-slate-600 mt-6">Evencia Mobile v1.0.0</Text>
     </ScrollView>
   );
 }
 
 function ProfileRow({ icon, label, value, valueColor, isLast }) {
   return (
-    <View className={`flex-row items-center px-4 py-3.5 ${!isLast ? 'border-b border-slate-100' : ''}`}>
+    <View className={`flex-row items-center px-4 py-3.5 ${!isLast ? 'border-b' : ''}`} style={!isLast ? { borderBottomColor: '#1e293b' } : undefined}>
       <Ionicons name={icon} size={20} color="#f59e0b" />
-      <Text className="text-sm text-slate-500 ml-3 flex-1">{label}</Text>
-      <Text className="text-sm font-medium" style={{ color: valueColor || '#0f172a' }}>
+      <Text className="text-sm text-slate-400 ml-3 flex-1">{label}</Text>
+      <Text className="text-sm font-medium" style={{ color: valueColor || '#f1f5f9' }}>
         {value || '—'}
       </Text>
     </View>
@@ -133,12 +129,13 @@ function ProfileRow({ icon, label, value, valueColor, isLast }) {
 function ActionRow({ icon, label, isLast }) {
   return (
     <TouchableOpacity
-      className={`flex-row items-center px-4 py-3.5 ${!isLast ? 'border-b border-slate-100' : ''}`}
+      className={`flex-row items-center px-4 py-3.5 ${!isLast ? 'border-b' : ''}`}
+      style={!isLast ? { borderBottomColor: '#1e293b' } : undefined}
       activeOpacity={0.6}
     >
-      <Ionicons name={icon} size={20} color="#64748b" />
-      <Text className="text-sm text-slate-700 ml-3 flex-1">{label}</Text>
-      <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
+      <Ionicons name={icon} size={20} color="#94a3b8" />
+      <Text className="text-sm text-slate-300 ml-3 flex-1">{label}</Text>
+      <Ionicons name="chevron-forward" size={16} color="#475569" />
     </TouchableOpacity>
   );
 }

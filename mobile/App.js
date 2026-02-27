@@ -77,10 +77,10 @@ function TabNavigator() {
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#f59e0b',
-        tabBarInactiveTintColor: '#94a3b8',
+        tabBarInactiveTintColor: '#475569',
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#f1f5f9',
+          backgroundColor: '#0f172a',
+          borderTopColor: '#1e293b',
           borderTopWidth: 1,
           height: 60,
           paddingBottom: 8,
@@ -105,12 +105,12 @@ function AppContent() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <View className="w-16 h-16 bg-amber-500 rounded-2xl items-center justify-center mb-4">
           <Ionicons name="calendar" size={32} color="#fff" />
         </View>
         <ActivityIndicator size="large" color="#f59e0b" />
-        <Text className="text-slate-500 mt-3 text-sm">Chargement...</Text>
+        <Text className="text-slate-400 mt-3 text-sm">Chargement...</Text>
       </View>
     );
   }

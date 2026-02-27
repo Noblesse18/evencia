@@ -1,8 +1,5 @@
 # Frontend Dockerfile - Next.js 16
-FROM node:20-alpine AS base
-
-# Installer les dépendances nécessaires pour les builds
-RUN apk add --no-cache libc6-compat
+FROM node:20-slim AS base
 
 # ==========================================
 # Étape des dépendances
@@ -45,8 +42,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Créer un utilisateur non-root pour la sécurité
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 nextjs
 
 # Copier les fichiers publics
 COPY --from=builder /app/public ./public

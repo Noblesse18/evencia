@@ -60,7 +60,7 @@ export default function EventDetailScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
@@ -68,9 +68,9 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <Ionicons name="alert-circle-outline" size={48} color="#ef4444" />
-        <Text className="text-slate-500 mt-3 text-base">Événement introuvable</Text>
+        <Text className="text-slate-400 mt-3 text-base">Événement introuvable</Text>
       </View>
     );
   }
@@ -91,7 +91,7 @@ export default function EventDetailScreen() {
   );
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1" style={{ backgroundColor: '#0a0a0f' }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Hero Image */}
         {event.image_url ? (
@@ -102,9 +102,10 @@ export default function EventDetailScreen() {
           </View>
         )}
 
-        {/* Back button overlay */}
+        {/* Back button */}
         <TouchableOpacity
-          className="absolute top-12 left-4 w-10 h-10 bg-black/30 rounded-full items-center justify-center"
+          className="absolute top-12 left-4 w-10 h-10 rounded-full items-center justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={22} color="#fff" />
@@ -112,27 +113,21 @@ export default function EventDetailScreen() {
 
         {/* Content */}
         <View className="px-4 -mt-6">
-          <View className="bg-white rounded-2xl p-5 shadow-sm">
-            {/* Category + Price */}
+          <View className="rounded-2xl p-5" style={{ backgroundColor: '#0f172a' }}>
             <View className="flex-row items-center justify-between mb-3">
-              <View className="bg-amber-50 px-3 py-1 rounded-full">
-                <Text className="text-xs font-medium text-amber-700">{event.category || '—'}</Text>
+              <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#1e293b' }}>
+                <Text className="text-xs font-medium text-amber-400">{event.category || '—'}</Text>
               </View>
-              <Text className="text-lg font-bold text-amber-600">{priceStr}</Text>
+              <Text className="text-lg font-bold text-amber-500">{priceStr}</Text>
             </View>
 
-            <Text className="text-xl font-bold text-slate-900 mb-4">{event.title}</Text>
+            <Text className="text-xl font-bold text-white mb-4">{event.title}</Text>
 
-            {/* Metadata */}
-            <View className="space-y-3">
+            <View>
               <InfoRow icon="calendar" color="#f59e0b" text={dateStr} />
-              {timeStr ? <InfoRow icon="time" color="#f59e0b" text={`${timeStr}`} /> : null}
+              {timeStr ? <InfoRow icon="time" color="#f59e0b" text={timeStr} /> : null}
               <InfoRow icon="location" color="#f59e0b" text={event.location || '—'} />
-              <InfoRow
-                icon="people"
-                color="#22c55e"
-                text={`${event.participants_count || 0} participant(s)`}
-              />
+              <InfoRow icon="people" color="#22c55e" text={`${event.participants_count || 0} participant(s)`} />
               {remaining != null && (
                 <InfoRow
                   icon="ticket"
@@ -142,26 +137,25 @@ export default function EventDetailScreen() {
               )}
             </View>
 
-            {/* Organizer */}
             {event.organizer && (
-              <View className="mt-4 pt-4 border-t border-slate-100 flex-row items-center">
-                <View className="w-10 h-10 bg-amber-100 rounded-full items-center justify-center">
-                  <Text className="text-amber-700 font-bold">
+              <View className="mt-4 pt-4 flex-row items-center" style={{ borderTopWidth: 1, borderTopColor: '#1e293b' }}>
+                <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: '#1e293b' }}>
+                  <Text className="text-amber-400 font-bold">
                     {(event.organizer.name || '?').charAt(0).toUpperCase()}
                   </Text>
                 </View>
                 <View className="ml-3">
-                  <Text className="text-sm font-medium text-slate-900">{event.organizer.name}</Text>
-                  <Text className="text-xs text-slate-500">Organisateur</Text>
+                  <Text className="text-sm font-medium text-white">{event.organizer.name}</Text>
+                  <Text className="text-xs text-slate-400">Organisateur</Text>
                 </View>
               </View>
             )}
           </View>
 
           {/* Description */}
-          <View className="bg-white rounded-2xl p-5 mt-3 shadow-sm">
-            <Text className="text-base font-bold text-slate-900 mb-2">Description</Text>
-            <Text className="text-sm text-slate-600 leading-5">
+          <View className="rounded-2xl p-5 mt-3" style={{ backgroundColor: '#0f172a' }}>
+            <Text className="text-base font-bold text-white mb-2">Description</Text>
+            <Text className="text-sm text-slate-300 leading-5">
               {event.description || 'Aucune description.'}
             </Text>
           </View>
@@ -169,10 +163,10 @@ export default function EventDetailScreen() {
       </ScrollView>
 
       {/* Bottom CTA */}
-      <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-4">
+      <View className="absolute bottom-0 left-0 right-0 px-4 py-4" style={{ backgroundColor: '#0f172a', borderTopWidth: 1, borderTopColor: '#1e293b' }}>
         <TouchableOpacity
           className={`rounded-xl py-4 items-center ${
-            alreadyInscribed ? 'bg-green-500' : 'bg-amber-500'
+            alreadyInscribed ? 'bg-green-600' : 'bg-amber-500'
           } ${inscribing ? 'opacity-70' : ''}`}
           onPress={handleInscribe}
           disabled={alreadyInscribed || inscribing}
@@ -182,11 +176,7 @@ export default function EventDetailScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <View className="flex-row items-center">
-              <Ionicons
-                name={alreadyInscribed ? 'checkmark-circle' : 'ticket'}
-                size={20}
-                color="#fff"
-              />
+              <Ionicons name={alreadyInscribed ? 'checkmark-circle' : 'ticket'} size={20} color="#fff" />
               <Text className="text-white text-base font-semibold ml-2">
                 {alreadyInscribed ? 'Inscrit' : 'S\'inscrire'}
               </Text>
@@ -201,13 +191,10 @@ export default function EventDetailScreen() {
 function InfoRow({ icon, color, text }) {
   return (
     <View className="flex-row items-center mb-2">
-      <View
-        className="w-8 h-8 rounded-lg items-center justify-center"
-        style={{ backgroundColor: color + '15' }}
-      >
+      <View className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: color + '15' }}>
         <Ionicons name={icon} size={16} color={color} />
       </View>
-      <Text className="text-sm text-slate-700 ml-3 flex-1">{text}</Text>
+      <Text className="text-sm text-slate-300 ml-3 flex-1">{text}</Text>
     </View>
   );
 }

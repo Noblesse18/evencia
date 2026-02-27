@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  RefreshControl,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,15 +14,15 @@ import { useAuth } from '../context/AuthContext';
 
 function StatCard({ icon, label, value, color }) {
   return (
-    <View className="bg-white rounded-2xl p-4 flex-1 mx-1 shadow-sm">
+    <View className="rounded-2xl p-4 flex-1 mx-1" style={{ backgroundColor: '#0f172a' }}>
       <View
         className="w-10 h-10 rounded-xl items-center justify-center mb-2"
         style={{ backgroundColor: color + '20' }}
       >
         <Ionicons name={icon} size={20} color={color} />
       </View>
-      <Text className="text-xl font-bold text-slate-900">{value}</Text>
-      <Text className="text-xs text-slate-500 mt-1">{label}</Text>
+      <Text className="text-xl font-bold text-white">{value}</Text>
+      <Text className="text-xs text-slate-400 mt-1">{label}</Text>
     </View>
   );
 }
@@ -47,7 +46,7 @@ function OrganizerDashboard({ navigation }) {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
@@ -56,43 +55,32 @@ function OrganizerDashboard({ navigation }) {
   const stats = data.stats || {};
 
   return (
-    <ScrollView className="flex-1 bg-slate-50" contentContainerStyle={{ paddingBottom: 32 }}>
+    <ScrollView className="flex-1" style={{ backgroundColor: '#0a0a0f' }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View className="bg-amber-500 px-6 pt-14 pb-8 rounded-b-3xl">
         <Text className="text-amber-100 text-sm">Dashboard</Text>
         <Text className="text-white text-2xl font-bold">Organisateur</Text>
       </View>
 
-      {/* Stats */}
       <View className="flex-row px-4 mt-4">
         <StatCard icon="calendar" label="Événements" value={stats.totalEvents || 0} color="#f59e0b" />
         <StatCard icon="ticket" label="Tickets vendus" value={stats.totalTicketsSold || 0} color="#22c55e" />
       </View>
       <View className="flex-row px-4 mt-2">
-        <StatCard
-          icon="cash"
-          label="Revenus"
-          value={`${Number(stats.totalRevenue || 0).toFixed(0)} €`}
-          color="#3b82f6"
-        />
+        <StatCard icon="cash" label="Revenus" value={`${Number(stats.totalRevenue || 0).toFixed(0)} €`} color="#3b82f6" />
         <StatCard
           icon="trending-up"
           label="Moy. participants"
-          value={
-            stats.totalEvents > 0
-              ? Math.round((stats.totalTicketsSold || 0) / stats.totalEvents)
-              : 0
-          }
+          value={stats.totalEvents > 0 ? Math.round((stats.totalTicketsSold || 0) / stats.totalEvents) : 0}
           color="#a855f7"
         />
       </View>
 
-      {/* Mes événements */}
       <View className="px-4 mt-6">
-        <Text className="text-lg font-bold text-slate-900 mb-3">Mes événements</Text>
+        <Text className="text-lg font-bold text-white mb-3">Mes événements</Text>
         {(data.events || []).length === 0 ? (
-          <View className="bg-white rounded-2xl p-6 items-center">
-            <Ionicons name="calendar-outline" size={40} color="#94a3b8" />
-            <Text className="text-slate-400 mt-2">Aucun événement créé</Text>
+          <View className="rounded-2xl p-6 items-center" style={{ backgroundColor: '#0f172a' }}>
+            <Ionicons name="calendar-outline" size={40} color="#475569" />
+            <Text className="text-slate-500 mt-2">Aucun événement créé</Text>
           </View>
         ) : (
           (data.events || []).map((event) => {
@@ -107,7 +95,8 @@ function OrganizerDashboard({ navigation }) {
             return (
               <TouchableOpacity
                 key={event.id}
-                className="bg-white rounded-2xl mb-3 overflow-hidden shadow-sm"
+                className="rounded-2xl mb-3 overflow-hidden"
+                style={{ backgroundColor: '#0f172a' }}
                 onPress={() => navigation.navigate('EventDetail', { eventId: event.id })}
                 activeOpacity={0.8}
               >
@@ -120,16 +109,12 @@ function OrganizerDashboard({ navigation }) {
                     </View>
                   )}
                   <View className="flex-1 p-3 justify-center">
-                    <Text className="text-sm font-bold text-slate-900 mb-1" numberOfLines={1}>{event.title}</Text>
-                    <Text className="text-xs text-slate-500 mb-2">📅 {dateStr}</Text>
-                    {/* Barre de remplissage */}
-                    <View className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <View
-                        className="h-full rounded-full"
-                        style={{ width: `${Math.min(fill, 100)}%`, backgroundColor: fillColor }}
-                      />
+                    <Text className="text-sm font-bold text-white mb-1" numberOfLines={1}>{event.title}</Text>
+                    <Text className="text-xs text-slate-400 mb-2">📅 {dateStr}</Text>
+                    <View className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#1e293b' }}>
+                      <View className="h-full rounded-full" style={{ width: `${Math.min(fill, 100)}%`, backgroundColor: fillColor }} />
                     </View>
-                    <Text className="text-xs text-slate-500 mt-1">
+                    <Text className="text-xs text-slate-400 mt-1">
                       {event.tickets_sold || event.participants_count || 0}/{event.max_tickets || '∞'} places ({fill}%)
                     </Text>
                   </View>
@@ -162,7 +147,7 @@ function ParticipantDashboard({ navigation }) {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
@@ -172,26 +157,24 @@ function ParticipantDashboard({ navigation }) {
   const past = inscriptions.filter((i) => new Date(i.event_date) < new Date());
 
   return (
-    <ScrollView className="flex-1 bg-slate-50" contentContainerStyle={{ paddingBottom: 32 }}>
+    <ScrollView className="flex-1" style={{ backgroundColor: '#0a0a0f' }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View className="bg-amber-500 px-6 pt-14 pb-8 rounded-b-3xl">
         <Text className="text-amber-100 text-sm">Dashboard</Text>
         <Text className="text-white text-2xl font-bold">Mes inscriptions</Text>
       </View>
 
-      {/* Stats */}
       <View className="flex-row px-4 mt-4">
-        <StatCard icon="ticket" label="Total inscriptions" value={inscriptions.length} color="#f59e0b" />
+        <StatCard icon="ticket" label="Total" value={inscriptions.length} color="#f59e0b" />
         <StatCard icon="time" label="À venir" value={upcoming.length} color="#22c55e" />
         <StatCard icon="checkmark-circle" label="Passés" value={past.length} color="#94a3b8" />
       </View>
 
-      {/* À venir */}
       <View className="px-4 mt-6">
-        <Text className="text-lg font-bold text-slate-900 mb-3">À venir</Text>
+        <Text className="text-lg font-bold text-white mb-3">À venir</Text>
         {upcoming.length === 0 ? (
-          <View className="bg-white rounded-2xl p-6 items-center">
-            <Ionicons name="calendar-outline" size={40} color="#94a3b8" />
-            <Text className="text-slate-400 mt-2">Aucun événement à venir</Text>
+          <View className="rounded-2xl p-6 items-center" style={{ backgroundColor: '#0f172a' }}>
+            <Ionicons name="calendar-outline" size={40} color="#475569" />
+            <Text className="text-slate-500 mt-2">Aucun événement à venir</Text>
           </View>
         ) : (
           upcoming.map((insc) => (
@@ -200,10 +183,9 @@ function ParticipantDashboard({ navigation }) {
         )}
       </View>
 
-      {/* Passés */}
       {past.length > 0 && (
         <View className="px-4 mt-6">
-          <Text className="text-lg font-bold text-slate-900 mb-3">Passés</Text>
+          <Text className="text-lg font-bold text-white mb-3">Passés</Text>
           {past.map((insc) => (
             <InscriptionCard key={insc.id} inscription={insc} navigation={navigation} isPast />
           ))}
@@ -220,7 +202,8 @@ function InscriptionCard({ inscription, navigation, isPast }) {
 
   return (
     <TouchableOpacity
-      className={`bg-white rounded-2xl mb-3 flex-row overflow-hidden shadow-sm ${isPast ? 'opacity-60' : ''}`}
+      className={`rounded-2xl mb-3 flex-row overflow-hidden ${isPast ? 'opacity-60' : ''}`}
+      style={{ backgroundColor: '#0f172a' }}
       onPress={() => navigation.navigate('EventDetail', { eventId: inscription.event_id })}
       activeOpacity={0.8}
     >
@@ -232,23 +215,23 @@ function InscriptionCard({ inscription, navigation, isPast }) {
         </View>
       )}
       <View className="flex-1 p-3 justify-center">
-        <Text className="text-sm font-bold text-slate-900 mb-1" numberOfLines={1}>
+        <Text className="text-sm font-bold text-white mb-1" numberOfLines={1}>
           {inscription.event_title}
         </Text>
         <View className="flex-row items-center mb-1">
           <Ionicons name="calendar-outline" size={12} color="#f59e0b" />
-          <Text className="text-xs text-slate-500 ml-1">{dateStr}</Text>
+          <Text className="text-xs text-slate-400 ml-1">{dateStr}</Text>
         </View>
         <View className="flex-row items-center">
           <Ionicons name="location-outline" size={12} color="#f59e0b" />
-          <Text className="text-xs text-slate-500 ml-1" numberOfLines={1}>
+          <Text className="text-xs text-slate-400 ml-1" numberOfLines={1}>
             {inscription.event_location || '—'}
           </Text>
         </View>
       </View>
       <View className="justify-center pr-3">
-        <View className={`px-2 py-1 rounded-full ${isPast ? 'bg-slate-100' : 'bg-green-50'}`}>
-          <Text className={`text-xs font-medium ${isPast ? 'text-slate-500' : 'text-green-600'}`}>
+        <View className="px-2 py-1 rounded-full" style={{ backgroundColor: isPast ? '#1e293b' : '#052e16' }}>
+          <Text className={`text-xs font-medium ${isPast ? 'text-slate-400' : 'text-green-400'}`}>
             {isPast ? 'Terminé' : 'Confirmé'}
           </Text>
         </View>

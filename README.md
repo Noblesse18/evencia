@@ -9,7 +9,7 @@
 |---------|-------------|
 | **Nom du projet** | Evencia |
 | **Type** | Application web fullstack de gestion d'événements |
-| **Stack technique** | Next.js 16 (Frontend) + Express.js (Backend) + MySQL + Drizzle ORM |
+| **Stack technique** | Next.js 16 (Frontend) + Express.js (Backend) + MySQL + Drizzle ORM + React Native Expo (Mobile) |
 | **Fonctionnalités principales** | Gestion d'événements, inscriptions, multi-rôles, dashboard organisateur |
 
 ---
@@ -104,13 +104,49 @@ npm run dev
 
 Le site est accessible sur **http://localhost:3000**. Par défaut, le frontend appelle l’API sur `http://localhost:5000/api`. Pour changer l’URL (ex. autre machine) : créer **`frontend/.env.local`** avec `NEXT_PUBLIC_API_URL=http://...`.
 
-### 4. Récapitulatif
+### 4. Mobile (React Native Expo)
+
+Dans un **autre terminal** :
+
+```bash
+cd mobile
+npm install
+```
+
+#### Sur émulateur Android
+
+Prérequis : Android SDK avec un AVD configuré (ex. `Pixel_7`).
+
+1. Lancer l'émulateur :
+   ```bash
+   emulator -avd Pixel_7 -no-snapshot -gpu auto
+   ```
+2. Lancer l'app (configure automatiquement le port forwarding) :
+   ```bash
+   npm run android
+   ```
+
+#### Sur téléphone physique (Expo Go)
+
+1. Installer **Expo Go** sur le téléphone (Play Store / App Store).
+2. S'assurer que le téléphone et le PC sont sur le **même réseau WiFi**.
+3. Modifier l'IP dans `src/api/client.js` avec l'IP de votre machine (`ip addr` sous Linux).
+4. Lancer Expo :
+   ```bash
+   npx expo start
+   ```
+5. Scanner le QR code affiché dans le terminal avec Expo Go.
+
+> **Note :** l'émulateur utilise `10.0.2.2` pour accéder au localhost du PC. Sur un téléphone physique, il faut l'IP réelle de la machine.
+
+### 5. Récapitulatif
 
 | Service   | URL locale              |
 |----------|--------------------------|
 | Frontend | http://localhost:3000    |
 | Backend  | http://localhost:5000   |
 | Swagger  | http://localhost:5000/api-docs |
+| Mobile   | Expo Go / Émulateur Android |
 
 ### Alternative : tout lancer avec Docker
 
@@ -332,6 +368,14 @@ api.interceptors.request.use((config) => { ... });
 - **express-validator** - Validation des données
 - **Swagger / OpenAPI 3** - Documentation interactive de l’API (`/api-docs`)
 - **Stripe** - Paiements (Payment Intents ; voir `docs/TP-Stripe-Evencia.md`)
+
+### Mobile
+- **React Native** - Framework mobile cross-platform
+- **Expo SDK 54** - Toolchain React Native
+- **NativeWind v4** - Tailwind CSS pour React Native
+- **React Navigation** - Navigation (Stack + Bottom Tabs)
+- **AsyncStorage** - Stockage local du token JWT
+- **Axios** - Client HTTP
 
 ### DevOps
 - **Docker** - Conteneurisation

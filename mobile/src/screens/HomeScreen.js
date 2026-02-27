@@ -34,8 +34,8 @@ function EventCard({ event, onPress }) {
 
   return (
     <TouchableOpacity
-      className="bg-white rounded-2xl mr-4 overflow-hidden shadow-sm"
-      style={{ width: 260 }}
+      className="rounded-2xl mr-4 overflow-hidden"
+      style={{ width: 260, backgroundColor: '#0f172a' }}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -47,20 +47,20 @@ function EventCard({ event, onPress }) {
         </View>
       )}
       <View className="p-4">
-        <Text className="text-base font-bold text-slate-900 mb-1" numberOfLines={1}>
+        <Text className="text-base font-bold text-white mb-1" numberOfLines={1}>
           {event.title}
         </Text>
         <View className="flex-row items-center mb-1">
           <Ionicons name="calendar-outline" size={14} color="#f59e0b" />
-          <Text className="text-xs text-slate-500 ml-1">{dateStr}</Text>
+          <Text className="text-xs text-slate-400 ml-1">{dateStr}</Text>
           <Ionicons name="location-outline" size={14} color="#f59e0b" style={{ marginLeft: 12 }} />
-          <Text className="text-xs text-slate-500 ml-1" numberOfLines={1}>{event.location || '—'}</Text>
+          <Text className="text-xs text-slate-400 ml-1" numberOfLines={1}>{event.location || '—'}</Text>
         </View>
         <View className="flex-row items-center justify-between mt-2">
-          <Text className="text-sm font-semibold text-amber-600">{priceStr}</Text>
+          <Text className="text-sm font-semibold text-amber-500">{priceStr}</Text>
           <View className="flex-row items-center">
-            <Ionicons name="people-outline" size={14} color="#64748b" />
-            <Text className="text-xs text-slate-500 ml-1">{event.participants_count || 0}</Text>
+            <Ionicons name="people-outline" size={14} color="#94a3b8" />
+            <Text className="text-xs text-slate-400 ml-1">{event.participants_count || 0}</Text>
           </View>
         </View>
       </View>
@@ -93,7 +93,7 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-slate-50">
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
         <ActivityIndicator size="large" color="#f59e0b" />
       </View>
     );
@@ -101,8 +101,9 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-slate-50"
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#f59e0b']} />}
+      className="flex-1"
+      style={{ backgroundColor: '#0a0a0f' }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#f59e0b']} tintColor="#f59e0b" />}
     >
       {/* Hero */}
       <View className="bg-amber-500 px-6 pt-14 pb-10 rounded-b-3xl">
@@ -117,7 +118,7 @@ export default function HomeScreen() {
 
       {/* Catégories */}
       <View className="mt-6 px-4">
-        <Text className="text-lg font-bold text-slate-900 mb-3">Catégories</Text>
+        <Text className="text-lg font-bold text-white mb-3">Catégories</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {CATEGORIES.map((cat) => (
             <TouchableOpacity
@@ -131,7 +132,7 @@ export default function HomeScreen() {
               >
                 <Ionicons name={cat.icon} size={24} color={cat.color} />
               </View>
-              <Text className="text-xs text-slate-600">{cat.label}</Text>
+              <Text className="text-xs text-slate-400">{cat.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -140,9 +141,9 @@ export default function HomeScreen() {
       {/* Événements à la une */}
       <View className="mt-6 px-4">
         <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-lg font-bold text-slate-900">À la une</Text>
+          <Text className="text-lg font-bold text-white">À la une</Text>
           <TouchableOpacity onPress={() => navigation.navigate('SearchTab')}>
-            <Text className="text-sm text-amber-600 font-medium">Voir tout</Text>
+            <Text className="text-sm text-amber-500 font-medium">Voir tout</Text>
           </TouchableOpacity>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -156,9 +157,9 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* Événements à venir */}
+      {/* Tous les événements */}
       <View className="mt-6 px-4 pb-8">
-        <Text className="text-lg font-bold text-slate-900 mb-3">Tous les événements</Text>
+        <Text className="text-lg font-bold text-white mb-3">Tous les événements</Text>
         {events.map((event) => {
           const dateStr = event.event_date
             ? new Date(event.event_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -170,7 +171,8 @@ export default function HomeScreen() {
           return (
             <TouchableOpacity
               key={event.id}
-              className="bg-white rounded-2xl mb-3 flex-row overflow-hidden shadow-sm"
+              className="rounded-2xl mb-3 flex-row overflow-hidden"
+              style={{ backgroundColor: '#0f172a' }}
               onPress={() => navigation.navigate('EventDetail', { eventId: event.id })}
               activeOpacity={0.8}
             >
@@ -182,18 +184,18 @@ export default function HomeScreen() {
                 </View>
               )}
               <View className="flex-1 p-3 justify-center">
-                <Text className="text-sm font-bold text-slate-900 mb-1" numberOfLines={1}>{event.title}</Text>
+                <Text className="text-sm font-bold text-white mb-1" numberOfLines={1}>{event.title}</Text>
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="calendar-outline" size={12} color="#f59e0b" />
-                  <Text className="text-xs text-slate-500 ml-1">{dateStr}</Text>
+                  <Text className="text-xs text-slate-400 ml-1">{dateStr}</Text>
                 </View>
                 <View className="flex-row items-center">
                   <Ionicons name="location-outline" size={12} color="#f59e0b" />
-                  <Text className="text-xs text-slate-500 ml-1" numberOfLines={1}>{event.location}</Text>
+                  <Text className="text-xs text-slate-400 ml-1" numberOfLines={1}>{event.location}</Text>
                 </View>
               </View>
               <View className="justify-center pr-3">
-                <Text className="text-xs font-semibold text-amber-600">{priceStr}</Text>
+                <Text className="text-xs font-semibold text-amber-500">{priceStr}</Text>
               </View>
             </TouchableOpacity>
           );

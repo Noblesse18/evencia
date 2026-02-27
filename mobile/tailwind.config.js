@@ -21,6 +21,12 @@ module.exports = {
           500: '#ea580c',
           600: '#c2410c',
         },
+        dark: {
+          DEFAULT: '#0a0a0f',
+          card: '#0f172a',
+          lighter: '#1e293b',
+          border: '#1e293b',
+        },
       },
     },
   },

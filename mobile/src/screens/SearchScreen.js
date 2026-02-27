@@ -75,7 +75,8 @@ export default function SearchScreen() {
 
     return (
       <TouchableOpacity
-        className="bg-white rounded-2xl mb-3 mx-4 flex-row overflow-hidden shadow-sm"
+        className="rounded-2xl mb-3 mx-4 flex-row overflow-hidden"
+        style={{ backgroundColor: '#0f172a' }}
         onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
         activeOpacity={0.8}
       >
@@ -87,19 +88,19 @@ export default function SearchScreen() {
           </View>
         )}
         <View className="flex-1 p-3 justify-center">
-          <Text className="text-sm font-bold text-slate-900 mb-1" numberOfLines={2}>{item.title}</Text>
+          <Text className="text-sm font-bold text-white mb-1" numberOfLines={2}>{item.title}</Text>
           <View className="flex-row items-center mb-1">
             <Ionicons name="calendar-outline" size={12} color="#f59e0b" />
-            <Text className="text-xs text-slate-500 ml-1">{dateStr}</Text>
+            <Text className="text-xs text-slate-400 ml-1">{dateStr}</Text>
           </View>
           <View className="flex-row items-center mb-2">
             <Ionicons name="location-outline" size={12} color="#f59e0b" />
-            <Text className="text-xs text-slate-500 ml-1" numberOfLines={1}>{item.location || '—'}</Text>
+            <Text className="text-xs text-slate-400 ml-1" numberOfLines={1}>{item.location || '—'}</Text>
           </View>
           <View className="flex-row items-center justify-between">
-            <Text className="text-xs font-semibold text-amber-600">{priceStr}</Text>
-            <View className="bg-amber-50 px-2 py-0.5 rounded-full">
-              <Text className="text-xs text-amber-700">{item.category || '—'}</Text>
+            <Text className="text-xs font-semibold text-amber-500">{priceStr}</Text>
+            <View className="px-2 py-0.5 rounded-full" style={{ backgroundColor: '#1e293b' }}>
+              <Text className="text-xs text-amber-400">{item.category || '—'}</Text>
             </View>
           </View>
         </View>
@@ -108,16 +109,16 @@ export default function SearchScreen() {
   };
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1" style={{ backgroundColor: '#0a0a0f' }}>
       {/* Search bar */}
-      <View className="bg-white px-4 pt-14 pb-4 shadow-sm">
-        <Text className="text-xl font-bold text-slate-900 mb-3">Rechercher</Text>
-        <View className="flex-row items-center bg-slate-100 rounded-xl px-3 py-2">
+      <View className="px-4 pt-14 pb-4" style={{ backgroundColor: '#0f172a' }}>
+        <Text className="text-xl font-bold text-white mb-3">Rechercher</Text>
+        <View className="flex-row items-center rounded-xl px-3 py-2" style={{ backgroundColor: '#1e293b' }}>
           <Ionicons name="search" size={20} color="#94a3b8" />
           <TextInput
-            className="flex-1 ml-2 text-base text-slate-900"
+            className="flex-1 ml-2 text-base text-white"
             placeholder="Rechercher un événement..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor="#64748b"
             value={search}
             onChangeText={setSearch}
             onSubmitEditing={handleSearch}
@@ -140,12 +141,13 @@ export default function SearchScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               className={`px-4 py-2 rounded-full mr-2 ${
-                category === item.key ? 'bg-amber-500' : 'bg-slate-100'
+                category === item.key ? 'bg-amber-500' : ''
               }`}
+              style={category !== item.key ? { backgroundColor: '#1e293b' } : undefined}
               onPress={() => setCategory(item.key)}
             >
               <Text className={`text-sm font-medium ${
-                category === item.key ? 'text-white' : 'text-slate-600'
+                category === item.key ? 'text-white' : 'text-slate-400'
               }`}>
                 {item.label}
               </Text>
@@ -165,8 +167,8 @@ export default function SearchScreen() {
         ListEmptyComponent={
           !loading ? (
             <View className="items-center py-16">
-              <Ionicons name="search-outline" size={48} color="#94a3b8" />
-              <Text className="text-slate-400 mt-3 text-base">Aucun événement trouvé</Text>
+              <Ionicons name="search-outline" size={48} color="#475569" />
+              <Text className="text-slate-500 mt-3 text-base">Aucun événement trouvé</Text>
             </View>
           ) : null
         }
