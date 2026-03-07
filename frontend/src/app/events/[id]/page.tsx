@@ -56,6 +56,9 @@ export default function EventDetailPage({ params }: PageProps) {
   // Vérifier si les places sont épuisées
   const isSoldOut = event != null && event.max_tickets != null && event.tickets_remaining != null && event.tickets_remaining <= 0;
 
+  // Vérifier si l'événement est passé
+  const isPast = !!(event?.event_date && new Date(event.event_date) < new Date());
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -182,6 +185,13 @@ export default function EventDetailPage({ params }: PageProps) {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 pb-16 relative z-10">
+        {isPast && (
+          <div className="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 flex items-center gap-3 font-medium">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            Cet événement est terminé
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <motion.div
@@ -325,8 +335,16 @@ export default function EventDetailPage({ params }: PageProps) {
                 Inscription
               </h3>
 
+              {/* Past event warning */}
+              {isPast && (
+                <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Cet événement est terminé
+                </div>
+              )}
+
               {/* Sold out warning */}
-              {isSoldOut && (
+              {!isPast && isSoldOut && (
                 <div className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   Cet événement est complet
@@ -347,7 +365,11 @@ export default function EventDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {!isRegistered ? (
+              {isPast ? (
+                <Button className="w-full" size="lg" disabled>
+                  Événement terminé
+                </Button>
+              ) : !isRegistered ? (
                 <Button
                   className="w-full"
                   size="lg"

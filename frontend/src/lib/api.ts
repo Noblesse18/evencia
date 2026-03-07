@@ -57,6 +57,7 @@ export interface EventFilters {
   price_max?: number;
   city?: string;
   search?: string;
+  include_past?: string;
   page?: number;
   limit?: number;
 }

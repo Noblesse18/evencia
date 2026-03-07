@@ -33,6 +33,7 @@ async function listEvents(req, res, next) {
       price_max, 
       city,
       search,
+      include_past,
       page = 1, 
       limit = 12 
     } = req.query;
@@ -45,6 +46,10 @@ async function listEvents(req, res, next) {
       WHERE 1=1
     `;
     const params = [];
+
+    if (!include_past || include_past !== 'true') {
+      query += ' AND (e.event_date >= NOW() OR e.event_date IS NULL)';
+    }
 
     // Filtre par catégorie
     if (category && category !== 'all') {

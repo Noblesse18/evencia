@@ -89,6 +89,7 @@ function EventsPageContent() {
     price_max: searchParams.get('price_max') || '',
     date_from: searchParams.get('date_from') || '',
     date_to: searchParams.get('date_to') || '',
+    include_past: 'false',
   });
 
   const { user, isAuthenticated, checkAuth } = useAuthStore();
@@ -116,6 +117,7 @@ function EventsPageContent() {
         price_max: filters.price_max ? parseFloat(filters.price_max) : undefined,
         date_from: filters.date_from || undefined,
         date_to: filters.date_to || undefined,
+        include_past: filters.include_past === 'true' ? 'true' : undefined,
       });
       const data = response.data as EventsResponse;
       setEvents(data.events || []);
@@ -150,6 +152,7 @@ function EventsPageContent() {
       price_max: '',
       date_from: '',
       date_to: '',
+      include_past: 'false',
     });
     setTimeout(() => fetchEvents(1), 0);
   };
@@ -312,11 +315,25 @@ function EventsPageContent() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-4">
-                  <Button onClick={applyFilters}>Appliquer les filtres</Button>
-                  <Button variant="ghost" onClick={resetFilters} leftIcon={<X className="w-4 h-4" />}>
-                    Réinitialiser
-                  </Button>
+                <div className="flex items-center justify-between mt-4">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={filters.include_past === 'true'}
+                      onChange={(e) => handleFilterChange('include_past', e.target.checked ? 'true' : 'false')}
+                      className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
+                    />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Afficher les événements passés
+                    </span>
+                  </label>
+
+                  <div className="flex gap-2">
+                    <Button onClick={applyFilters}>Appliquer les filtres</Button>
+                    <Button variant="ghost" onClick={resetFilters} leftIcon={<X className="w-4 h-4" />}>
+                      Réinitialiser
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -365,7 +382,9 @@ function EventsPageContent() {
         ) : events.length > 0 ? (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event, index) => (
+              {events.map((event, index) => {
+                const isPast = event.event_date && new Date(event.event_date) < new Date();
+                return (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -373,18 +392,23 @@ function EventsPageContent() {
                   transition={{ delay: index * 0.05 }}
                 >
                   <Link href={`/events/${event.id}`}>
-                    <Card variant="elevated" hover className="h-full">
+                    <Card variant="elevated" hover className={`h-full ${isPast ? 'opacity-60' : ''}`}>
                       {/* Image/Placeholder */}
                       <div className="h-48 bg-gradient-to-br from-amber-400 to-orange-600 relative overflow-hidden">
                         {event.image_url ? (
-                          <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+                          <img src={event.image_url} alt={event.title} className={`w-full h-full object-cover ${isPast ? 'grayscale' : ''}`} />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <Calendar className="w-16 h-16 text-white/30" />
                           </div>
                         )}
+                        {isPast && (
+                          <span className="absolute top-3 left-3 px-2 py-1 rounded-full bg-red-500/90 text-xs font-medium text-white z-10">
+                            Terminé
+                          </span>
+                        )}
                         {/* Category Badge */}
-                        {event.category && (
+                        {event.category && !isPast && (
                           <span className="absolute top-3 left-3 px-2 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 text-xs font-medium text-slate-700 dark:text-slate-300 capitalize">
                             {event.category}
                           </span>
@@ -439,7 +463,8 @@ function EventsPageContent() {
                     </Card>
                   </Link>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination */}

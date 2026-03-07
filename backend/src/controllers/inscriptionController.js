@@ -9,11 +9,17 @@ async function createInscription(req, res, next) {
     if (!event_id) return res.status(400).json({ message: 'event_id requis' });
 
     // Vérifier que l'événement existe
-    const [evRows] = await pool.execute('SELECT id, max_tickets FROM events WHERE id = ?', [event_id]);
+    const [evRows] = await pool.execute('SELECT id, max_tickets, event_date FROM events WHERE id = ?', [event_id]);
     if (!evRows.length) return res.status(404).json({ message: 'Événement introuvable' });
 
-    // Vérifier s'il reste des places
     const event = evRows[0];
+
+    // Vérifier que l'événement n'est pas passé
+    if (event.event_date && new Date(event.event_date) < new Date()) {
+      return res.status(400).json({ message: 'Cet événement est déjà terminé' });
+    }
+
+    // Vérifier s'il reste des places
     if (event.max_tickets) {
       const [countResult] = await pool.execute(
         'SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = "confirmed"',
