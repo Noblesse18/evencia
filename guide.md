@@ -141,6 +141,93 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 FRONTEND_URL=http://localhost:3000
 ```
 
+## 5. Déploiement en production (Oracle Cloud + nginx)
+
+### Prérequis serveur
+
+- Un VPS Oracle Cloud Free Tier (gratuit) : [cloud.oracle.com](https://cloud.oracle.com)
+  - Instance **VM.Standard.A1.Flex** (ARM, 4 CPU, 24 Go RAM)
+  - OS : Ubuntu 22.04
+  - Ouvrir les ports **80** et **443** dans les Security Lists du VCN
+- Un sous-domaine gratuit via [duckdns.org](https://duckdns.org) (ex: `evencia.duckdns.org`)
+
+### Installer Docker sur le serveur
+
+```bash
+ssh -i cle_privee.key ubuntu@IP_DU_SERVEUR
+
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+# Se déconnecter et reconnecter pour appliquer le groupe docker
+```
+
+### Cloner et configurer
+
+```bash
+git clone git@github.com:Noblesse18/evencia.git ~/evencia
+cd ~/evencia
+
+# Créer le .env de production à partir du template
+cp .env.production .env
+```
+
+Éditer `.env` et remplir les valeurs :
+
+```env
+DOMAIN=evencia.duckdns.org
+DB_PASSWORD=un_mot_de_passe_fort
+JWT_SECRET=un_secret_genere_avec_openssl_rand_hex_32
+CORS_ORIGINS=https://evencia.duckdns.org
+FRONTEND_URL=https://evencia.duckdns.org
+NEXT_PUBLIC_API_URL=https://evencia.duckdns.org/api
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+### Lancer en production
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+Vérifier que tout tourne :
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f
+```
+
+### Activer HTTPS avec Certbot
+
+Obtenir le certificat SSL (le site doit être accessible sur le port 80) :
+
+```bash
+docker compose -f docker-compose.prod.yml exec certbot \
+  certbot certonly --webroot -w /var/www/certbot -d evencia.duckdns.org
+```
+
+Puis redémarrer nginx :
+
+```bash
+docker compose -f docker-compose.prod.yml restart nginx
+```
+
+### Configurer le webhook Stripe en production
+
+1. Aller sur [dashboard.stripe.com/webhooks](https://dashboard.stripe.com/webhooks)
+2. Ajouter un endpoint : `https://evencia.duckdns.org/api/payments/webhook`
+3. Sélectionner l'événement `checkout.session.completed`
+4. Copier le signing secret et le mettre dans `.env` comme `STRIPE_WEBHOOK_SECRET`
+5. Redémarrer le backend : `docker compose -f docker-compose.prod.yml restart backend`
+
+### Mettre à jour le site
+
+```bash
+cd ~/evencia
+git pull
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
 ## Dépannage
 
 ### `adb` ou `emulator` non trouvé

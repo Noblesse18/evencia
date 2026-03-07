@@ -25,8 +25,10 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copier le code source
 COPY . .
 
-# Variable d'environnement pour le build
+# Variables d'environnement pour le build
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL=http://localhost:5000/api
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Builder l'application
 RUN npm run build
