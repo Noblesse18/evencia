@@ -71,7 +71,13 @@ app.use('/api/auth/register', authLimiter);
 app.use('/api/auth/reset-password', authLimiter);
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/payments/webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 // Documentation Swagger (OpenAPI)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {

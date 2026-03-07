@@ -26,10 +26,13 @@ const payments = mysqlTable('payments', {
 
     // Status du paiement avec toutes les options possibles 
     status: mysqlEnum('status', [
-        'pending',      // en attente
-        'completed',    // payé avec succès 
-        'failed',       // échec du paiement 
-        'refunded',     // remboursé 
+        'pending',          // en attente
+        'processing',       // en cours
+        'requires_action',  // action requise
+        'succeeded',        // payé avec succès
+        'canceled',         // annulé
+        'failed',           // échec du paiement
+        'refunded',         // remboursé
     ]).default('pending'), 
 
     // ✅ STRIPE - ID du PaymentIntent (pi_xxxxx)
@@ -59,11 +62,11 @@ const payments = mysqlTable('payments', {
     refund_reason: text('refund_reason'),
 
     // Timestamps
-    createdAt: timestamp('createdAt').defaultNow(),
-    updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow(),
+    createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow().onUpdateNow(),
 
     // Date du remboursement si applicable 
-    refunded_at: timestamp('refunded_at'),
+    refunded_at: timestamp('refunded_at', { mode: 'string' }),
 });
 
 module.exports = { payments };

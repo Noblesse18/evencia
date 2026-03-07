@@ -30,13 +30,13 @@ const users = mysqlTable('users', {
     // COLONNE: createdAt
     // Type: TIMESTAMP
     // Valeur par défaut: Date/heure actuelle
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
+    createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow().notNull(),
     
     // COLONNE: updatedAt
     // Type: TIMESTAMP
     // Se met à jour automatiquement à chaque modification
-    updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow(),
-    lastLogin: timestamp('last_login', {mode: 'date'}).default(null),
+    updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow().onUpdateNow(),
+    lastLogin: timestamp('last_login', { mode: 'string' }).default(null),
   });
   
   // Exporter le schéma pour l'utiliser ailleurs

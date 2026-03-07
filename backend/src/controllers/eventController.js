@@ -160,6 +160,10 @@ async function createEvent(req, res, next) {
   try {
     const { title, description, category, location, event_date, price, max_tickets, image_url, photos } = req.body;
     const organizer_id = req.user.userId;
+
+    if (event_date && new Date(event_date) <= new Date()) {
+      return res.status(400).json({ message: "La date de l'événement doit être dans le futur" });
+    }
     
     const newEvent = await eventRepository.createEvent({
       title, 
@@ -247,19 +251,19 @@ async function getOrganizerEvents(req, res, next) {
     const [rows] = await pool.execute(`
       SELECT e.*, 
         (SELECT COUNT(*) FROM inscriptions i WHERE i.event_id = e.id AND i.status = 'confirmed') as participants_count,
-        (SELECT COUNT(*) FROM inscriptions i WHERE i.event_id = e.id AND i.status = 'confirmed') as tickets_sold
+        (SELECT COUNT(*) FROM inscriptions i WHERE i.event_id = e.id AND i.status = 'confirmed') as tickets_sold,
+        COALESCE((SELECT SUM(p.amount) FROM payments p WHERE p.event_id = e.id AND p.status = 'succeeded'), 0) as event_revenue
       FROM events e 
       WHERE e.organizer_id = ?
       ORDER BY e.createdAt DESC
     `, [organizer_id]);
     
-    // Calculer les statistiques globales
     let totalTicketsSold = 0;
     let totalRevenue = 0;
     
     rows.forEach(event => {
-      totalTicketsSold += event.tickets_sold || 0;
-      totalRevenue += (event.tickets_sold || 0) * (parseFloat(event.price) || 0);
+      totalTicketsSold += Number(event.tickets_sold) || 0;
+      totalRevenue += parseFloat(event.event_revenue) || 0;
     });
     
     res.json({

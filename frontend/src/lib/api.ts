@@ -119,7 +119,7 @@ export const usersAPI = {
 
 // Payments API
 export const paymentsAPI = {
-  createPaymentIntent: (eventId: string) => api.post('/payments', { event_id: eventId }),
+  createCheckoutSession: (eventId: string) => api.post('/payments', { event_id: eventId }),
 };
 
 export default api;

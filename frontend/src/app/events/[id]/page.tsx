@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, use, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -22,7 +22,7 @@ import {
   Users,
   AlertCircle,
 } from 'lucide-react';
-import { eventsAPI, inscriptionsAPI } from '@/lib/api';
+import { eventsAPI, inscriptionsAPI, paymentsAPI } from '@/lib/api';
 import { Event } from '@/lib/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -36,8 +36,17 @@ interface PageProps {
 }
 
 export default function EventDetailPage({ params }: PageProps) {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-amber-500" /></div>}>
+      <EventDetailContent params={params} />
+    </Suspense>
+  );
+}
+
+function EventDetailContent({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, checkAuth } = useAuthStore();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -67,6 +76,19 @@ export default function EventDetailPage({ params }: PageProps) {
     fetchEvent();
   }, [id]);
 
+  // Gérer le retour de Stripe Checkout
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'success') {
+      setIsRegistered(true);
+      setSuccess('Paiement réussi ! Vous êtes inscrit à cet événement.');
+      router.replace(`/events/${id}`, { scroll: false });
+    } else if (paymentStatus === 'cancel') {
+      setError('Paiement annulé. Vous pouvez réessayer.');
+      router.replace(`/events/${id}`, { scroll: false });
+    }
+  }, [searchParams, id, router]);
+
   const fetchEvent = async () => {
     try {
       const response = await eventsAPI.getById(id);
@@ -90,14 +112,20 @@ export default function EventDetailPage({ params }: PageProps) {
     setSuccess('');
 
     try {
+      if (event && event.price > 0) {
+        const response = await paymentsAPI.createCheckoutSession(id);
+        const data = response.data as { url: string; warning?: string };
+        window.location.href = data.url;
+        return;
+      }
+
       await inscriptionsAPI.create(id);
       setIsRegistered(true);
       setSuccess('Vous êtes inscrit à cet événement !');
-      // Recharger l'événement pour mettre à jour le compteur
       fetchEvent();
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string }>;
-      if (axiosError.response?.data?.message === 'Déjà inscrit') {
+      if (axiosError.response?.data?.message === 'Déjà inscrit' || axiosError.response?.data?.message === 'Vous êtes déjà inscrit à cet événement') {
         setIsRegistered(true);
         setSuccess('Vous êtes déjà inscrit à cet événement');
       } else {

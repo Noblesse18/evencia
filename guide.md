@@ -81,11 +81,50 @@ docker compose up --build -d
 emulator -avd Medium_Phone_API_36.1 -no-snapshot-load -qt-hide-window -no-skin &
 scrcpy
 
-# Terminal 3 : Application mobile Expo
+# Terminal 3 : Stripe webhook (paiements)
+stripe listen --forward-to localhost:5000/api/payments/webhook
+
+# Terminal 4 : Application mobile Expo
 cd /home/comaravel/bts/evencia/mobile
 npx expo start
 # Appuyer sur 'a' pour ouvrir sur Android
 ```
+
+## 4. Lancer Stripe (paiements)
+
+### Installer Stripe CLI
+
+```bash
+curl -L https://github.com/stripe/stripe-cli/releases/latest/download/stripe_linux_x86_64.tar.gz -o /tmp/stripe.tar.gz
+tar -xzf /tmp/stripe.tar.gz -C /tmp
+sudo mv /tmp/stripe /usr/local/bin/
+```
+
+### Se connecter à Stripe
+
+```bash
+stripe login
+```
+
+### Lancer le listener de webhook
+
+```bash
+stripe listen --forward-to localhost:5000/api/payments/webhook
+```
+
+Copier le `whsec_...` affiché et le mettre dans `.env` :
+
+```env
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxx
+```
+
+Puis redémarrer le backend (`docker compose restart backend`).
+
+Laisser `stripe listen` tourner dans un terminal pendant le développement.
+
+### Carte de test
+
+Numéro : `4242 4242 4242 4242`, date future quelconque, CVC quelconque.
 
 ## Variables d'environnement
 
@@ -98,6 +137,8 @@ DB_NAME=evencianew
 JWT_SECRET=votre_secret
 CORS_ORIGINS=http://localhost:3000,http://localhost:5000
 STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+FRONTEND_URL=http://localhost:3000
 ```
 
 ## Dépannage

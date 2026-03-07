@@ -26,7 +26,7 @@ class EventRepository extends BaseRepository {
             description: eventData.description?.trim(),
             category: eventData.category || 'autre',      // Ajouté
             location: eventData.location?.trim(),
-            event_date: eventData.event_date,
+            event_date: eventData.event_date ? eventData.event_date.replace('T', ' ') : null,
             price: eventData.price || 0,
             max_tickets: eventData.max_tickets || null,
             organizer_id: eventData.organizer_id,

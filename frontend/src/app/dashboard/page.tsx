@@ -333,7 +333,7 @@ export default function OrganizerDashboard() {
                           {event.participants_count || 0} / {event.max_tickets || '∞'} places
                         </span>
                         <span className="font-medium text-amber-600 dark:text-amber-400">
-                          {((event.participants_count || 0) * (event.price || 0)).toFixed(2)} €
+                          {parseFloat((event as any).event_revenue || 0).toFixed(2)} €
                         </span>
                       </div>
                       {event.max_tickets && (

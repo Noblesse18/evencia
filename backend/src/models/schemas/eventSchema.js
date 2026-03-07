@@ -13,7 +13,7 @@ const events = mysqlTable('events', {
     location: varchar('location', {length: 500 }), 
     
     //date de l'evement (peut etre NULL)
-    event_date: timestamp('event_date'),
+    event_date: timestamp('event_date', { mode: 'string' }),
 
     // Prix avec 2 decimales (10 chiffres max dont 2 apres la virgule)
     price: decimal('price', { precision: 10, scale: 2 }).default(0),
@@ -33,8 +33,8 @@ const events = mysqlTable('events', {
     image_url: varchar('image_url', {length: 500}),
 
     // Dates de creation et modification
-    createdAt: timestamp('createdAt').defaultNow(),
-    updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow(),
+    createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow(),
+    updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow().onUpdateNow(),
     
 });
 

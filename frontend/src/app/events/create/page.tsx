@@ -70,6 +70,13 @@ export default function CreateEventPage() {
     setError('');
     setErrors([]);
 
+    if (formData.event_date && new Date(formData.event_date) <= new Date()) {
+      setErrors([{ field: 'event_date', message: "La date de l'événement doit être dans le futur" }]);
+      setError("La date de l'événement doit être dans le futur");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await eventsAPI.create({
         title: formData.title,

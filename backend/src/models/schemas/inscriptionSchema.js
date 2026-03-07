@@ -29,8 +29,8 @@ const inscriptions = mysqlTable('inscriptions', {
         'cancelled',    // inscription annulee
     ]).default('pending'), 
 
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
-    updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+    createdAt: timestamp('createdAt', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updatedAt', { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 
 }, (table) => {
     // CONTRAINTE UNIQUE COMPOSEE 
