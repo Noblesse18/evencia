@@ -46,6 +46,7 @@ const categories = [
 export default function Home() {
   const { isAuthenticated, checkAuth } = useAuthStore();
   const [events, setEvents] = useState<Event[]>([]);
+  const [featuredEvent, setFeaturedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -55,9 +56,16 @@ export default function Home() {
 
   const fetchEvents = async () => {
     try {
-      const response = await eventsAPI.getAll({ limit: 3 });
+      const response = await eventsAPI.getAll({ limit: 20 });
       const data = response.data as EventsResponse;
-      setEvents(data.events || []);
+      const allEvents = data.events || [];
+
+      if (allEvents.length > 0) {
+        const randomIndex = Math.floor(Math.random() * allEvents.length);
+        setFeaturedEvent(allEvents[randomIndex]);
+      }
+
+      setEvents(allEvents.slice(0, 3));
     } catch (error) {
       console.error('Erreur lors du chargement des événements:', error);
     } finally {
@@ -120,17 +128,59 @@ export default function Home() {
                 <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-3xl" />
                 
                 {/* Main card */}
-                <Card variant="elevated" className="relative z-10 p-6">
-                  <div className="aspect-video bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl mb-4 flex items-center justify-center">
-                    <Calendar className="w-20 h-20 text-white/80" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    Événement à la une
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400">
-                    Découvrez notre sélection d&apos;événements exceptionnels
-                  </p>
-                </Card>
+                {featuredEvent ? (
+                  <Link href={`/events/${featuredEvent.id}`}>
+                    <Card variant="elevated" hover className="relative z-10 p-6">
+                      <div className="aspect-video bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                        {featuredEvent.image_url ? (
+                          <img src={featuredEvent.image_url} alt={featuredEvent.title} className="w-full h-full object-cover rounded-xl" />
+                        ) : (
+                          <Calendar className="w-20 h-20 text-white/80" />
+                        )}
+                      </div>
+                      <span className="inline-block px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-medium mb-2 capitalize">
+                        {featuredEvent.category || 'Événement'}
+                      </span>
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 line-clamp-1">
+                        {featuredEvent.title}
+                      </h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm mb-3 line-clamp-2">
+                        {featuredEvent.description || 'Découvrez cet événement exceptionnel'}
+                      </p>
+                      <div className="flex flex-wrap gap-3 text-sm text-slate-500 dark:text-slate-400">
+                        {featuredEvent.event_date && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {format(new Date(featuredEvent.event_date), 'dd MMM yyyy', { locale: fr })}
+                          </span>
+                        )}
+                        {featuredEvent.location && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {featuredEvent.location}
+                          </span>
+                        )}
+                      </div>
+                      {featuredEvent.price > 0 && (
+                        <div className="mt-3 text-lg font-bold text-amber-600 dark:text-amber-400">
+                          {featuredEvent.price} €
+                        </div>
+                      )}
+                    </Card>
+                  </Link>
+                ) : (
+                  <Card variant="elevated" className="relative z-10 p-6">
+                    <div className="aspect-video bg-gradient-to-br from-amber-400 to-orange-600 rounded-xl mb-4 flex items-center justify-center">
+                      <Calendar className="w-20 h-20 text-white/80" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                      Événement à la une
+                    </h3>
+                    <p className="text-slate-500 dark:text-slate-400">
+                      Découvrez notre sélection d&apos;événements exceptionnels
+                    </p>
+                  </Card>
+                )}
               </div>
             </motion.div>
           </div>

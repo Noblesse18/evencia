@@ -44,8 +44,12 @@ docker compose down
 
 ### Démarrer l'émulateur (mode headless)
 
+Lister les AVD disponibles : `emulator -list-avds`
+
+Puis lancer l'émulateur :
+
 ```bash
-emulator -avd Medium_Phone_API_36.1 -no-snapshot-load -qt-hide-window -no-skin &
+emulator -avd Pixel_9 -no-snapshot-load -qt-hide-window -no-skin &
 ```
 
 ### Afficher l'écran avec scrcpy
@@ -78,7 +82,7 @@ cd /home/comaravel/bts/evencia
 docker compose up --build -d
 
 # Terminal 2 : Émulateur Android
-emulator -avd Medium_Phone_API_36.1 -no-snapshot-load -qt-hide-window -no-skin &
+emulator -avd Pixel_9 -no-snapshot-load -qt-hide-window -no-skin &
 scrcpy
 
 # Terminal 3 : Stripe webhook (paiements)
@@ -146,32 +150,57 @@ FRONTEND_URL=http://localhost:3000
 ### Prérequis serveur
 
 - Un VPS Oracle Cloud Free Tier (gratuit) : [cloud.oracle.com](https://cloud.oracle.com)
-  - Instance **VM.Standard.A1.Flex** (ARM, 4 CPU, 24 Go RAM)
-  - OS : Ubuntu 22.04
+  - Instance **VM.Standard.A1.Flex** (ARM) ou **VM.Standard.E2.1.Micro** (x86)
+  - OS : Ubuntu 22.04 ou **Oracle Linux** (utilisateur `opc`)
   - Ouvrir les ports **80** et **443** dans les Security Lists du VCN
 - Un sous-domaine gratuit via [duckdns.org](https://duckdns.org) (ex: `evencia.duckdns.org`)
 
-### Installer Docker sur le serveur
+### Étape 1 : Se connecter au VPS
 
 ```bash
-ssh -i cle_privee.key ubuntu@IP_DU_SERVEUR
+ssh -i /chemin/vers/ta-cle.key opc@IP_DU_VPS
+# Pour Oracle Linux, l'utilisateur est "opc" (pas ubuntu)
+```
 
+### Étape 2 : Installer Docker et Git
+
+**Oracle Linux :**
+
+```bash
+sudo dnf install -y docker-engine git
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+```
+
+**Ubuntu :**
+
+```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
-# Se déconnecter et reconnecter pour appliquer le groupe docker
 ```
 
-### Cloner et configurer
+> ⚠️ **Se déconnecter et reconnecter** pour que le groupe `docker` soit pris en compte.
+
+### Étape 3 : Cloner le projet
 
 ```bash
-git clone git@github.com:Noblesse18/evencia.git ~/evencia
+# Via HTTPS (recommandé si pas de clé SSH GitHub sur le VPS)
+git clone https://github.com/Noblesse18/evencia.git ~/evencia
 cd ~/evencia
 
-# Créer le .env de production à partir du template
-cp .env.production .env
+# OU via SSH (si tu as ajouté une clé déploiement sur le VPS)
+# git clone git@github.com:Noblesse18/evencia.git ~/evencia
 ```
 
-Éditer `.env` et remplir les valeurs :
+### Étape 4 : Configurer les variables d'environnement
+
+```bash
+cp .env.production .env
+nano .env   # ou vi .env
+```
+
+Remplir les valeurs dans `.env` (remplace `evencia.duckdns.org` par ton domaine) :
 
 ```env
 DOMAIN=evencia.duckdns.org
@@ -184,7 +213,9 @@ STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-### Lancer en production
+Générer un JWT_SECRET : `openssl rand -hex 32`
+
+### Étape 5 : Lancer en production
 
 ```bash
 docker compose -f docker-compose.prod.yml up --build -d
@@ -197,7 +228,14 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f
 ```
 
-### Activer HTTPS avec Certbot
+**Test rapide sans domaine** : Si tu n'as pas encore de domaine, configure `.env` avec l'IP du VPS :
+- `CORS_ORIGINS=http://IP_DU_VPS`
+- `FRONTEND_URL=http://IP_DU_VPS`
+- `NEXT_PUBLIC_API_URL=http://IP_DU_VPS/api`
+
+Puis accède au site via `http://IP_DU_VPS`. Pour HTTPS, il faut un nom de domaine.
+
+### Étape 6 : Activer HTTPS avec Certbot (avec un domaine)
 
 Obtenir le certificat SSL (le site doit être accessible sur le port 80) :
 
@@ -212,7 +250,7 @@ Puis redémarrer nginx :
 docker compose -f docker-compose.prod.yml restart nginx
 ```
 
-### Configurer le webhook Stripe en production
+### Étape 7 : Configurer le webhook Stripe en production
 
 1. Aller sur [dashboard.stripe.com/webhooks](https://dashboard.stripe.com/webhooks)
 2. Ajouter un endpoint : `https://evencia.duckdns.org/api/payments/webhook`
@@ -220,7 +258,7 @@ docker compose -f docker-compose.prod.yml restart nginx
 4. Copier le signing secret et le mettre dans `.env` comme `STRIPE_WEBHOOK_SECRET`
 5. Redémarrer le backend : `docker compose -f docker-compose.prod.yml restart backend`
 
-### Mettre à jour le site
+### Mise à jour du site
 
 ```bash
 cd ~/evencia
