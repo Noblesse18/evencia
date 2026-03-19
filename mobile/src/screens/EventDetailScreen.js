@@ -21,16 +21,26 @@ export default function EventDetailScreen() {
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [inscribing, setInscribing] = useState(false);
-  const [alreadyInscribed, setAlreadyInscribed] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [inscriptionId, setInscriptionId] = useState(null);
+  const alreadyInscribed = !!inscriptionId;
 
   useEffect(() => {
     if (!eventId) return;
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await apiClient.get(`/events/${eventId}`);
-        if (!cancelled) setEvent(data);
+        const [eventRes, inscRes] = await Promise.all([
+          apiClient.get(`/events/${eventId}`),
+          user ? apiClient.get('/inscriptions/my').catch(() => null) : Promise.resolve(null),
+        ]);
+        if (cancelled) return;
+        setEvent(eventRes.data);
+        if (inscRes?.data) {
+          const myInsc = (Array.isArray(inscRes.data) ? inscRes.data : [])
+            .find((i) => i.event_id === eventId && i.status !== 'cancelled');
+          if (myInsc) setInscriptionId(myInsc.id);
+        }
       } catch {
         if (!cancelled) setEvent(null);
       } finally {
@@ -45,17 +55,44 @@ export default function EventDetailScreen() {
       Alert.alert('Connexion requise', 'Connectez-vous pour vous inscrire.');
       return;
     }
-    setInscribing(true);
+    setActionLoading(true);
     try {
-      await apiClient.post('/inscriptions', { event_id: eventId });
-      setAlreadyInscribed(true);
+      const { data } = await apiClient.post('/inscriptions', { event_id: eventId });
+      setInscriptionId(data.inscription?.id || data.id || 'inscribed');
       Alert.alert('Succès', 'Vous êtes inscrit à cet événement !');
     } catch (err) {
       const msg = err.response?.data?.message || 'Erreur lors de l\'inscription.';
       Alert.alert('Erreur', msg);
     } finally {
-      setInscribing(false);
+      setActionLoading(false);
     }
+  };
+
+  const handleUnsubscribe = () => {
+    Alert.alert(
+      'Se désinscrire',
+      'Voulez-vous vraiment vous désinscrire de cet événement ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Se désinscrire',
+          style: 'destructive',
+          onPress: async () => {
+            setActionLoading(true);
+            try {
+              await apiClient.delete(`/inscriptions/${inscriptionId}`);
+              setInscriptionId(null);
+              Alert.alert('Succès', 'Vous avez été désinscrit.');
+            } catch (err) {
+              const msg = err.response?.data?.message || 'Erreur lors de la désinscription.';
+              Alert.alert('Erreur', msg);
+            } finally {
+              setActionLoading(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   if (loading) {
@@ -164,25 +201,40 @@ export default function EventDetailScreen() {
 
       {/* Bottom CTA */}
       <View className="absolute bottom-0 left-0 right-0 px-4 py-4" style={{ backgroundColor: '#0f172a', borderTopWidth: 1, borderTopColor: '#1e293b' }}>
-        <TouchableOpacity
-          className={`rounded-xl py-4 items-center ${
-            alreadyInscribed ? 'bg-green-600' : 'bg-amber-500'
-          } ${inscribing ? 'opacity-70' : ''}`}
-          onPress={handleInscribe}
-          disabled={alreadyInscribed || inscribing}
-          activeOpacity={0.8}
-        >
-          {inscribing ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <View className="flex-row items-center">
-              <Ionicons name={alreadyInscribed ? 'checkmark-circle' : 'ticket'} size={20} color="#fff" />
-              <Text className="text-white text-base font-semibold ml-2">
-                {alreadyInscribed ? 'Inscrit' : 'S\'inscrire'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        {alreadyInscribed ? (
+          <TouchableOpacity
+            className={`rounded-xl py-4 items-center ${actionLoading ? 'opacity-70' : ''}`}
+            style={{ backgroundColor: '#7f1d1d' }}
+            onPress={handleUnsubscribe}
+            disabled={actionLoading}
+            activeOpacity={0.8}
+          >
+            {actionLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <View className="flex-row items-center">
+                <Ionicons name="close-circle" size={20} color="#fff" />
+                <Text className="text-white text-base font-semibold ml-2">Se désinscrire</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            className={`rounded-xl py-4 items-center bg-amber-500 ${actionLoading ? 'opacity-70' : ''}`}
+            onPress={handleInscribe}
+            disabled={actionLoading}
+            activeOpacity={0.8}
+          >
+            {actionLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <View className="flex-row items-center">
+                <Ionicons name="ticket" size={20} color="#fff" />
+                <Text className="text-white text-base font-semibold ml-2">S'inscrire</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

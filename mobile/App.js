@@ -62,6 +62,19 @@ function DashboardStack() {
   );
 }
 
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ ...screenOptions, headerShown: false }}>
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 function TabNavigator() {
   return (
     <Tab.Navigator
@@ -95,7 +108,7 @@ function TabNavigator() {
       <Tab.Screen name="HomeTab" component={HomeStack} options={{ title: 'Accueil' }} />
       <Tab.Screen name="SearchTab" component={SearchStack} options={{ title: 'Recherche' }} />
       <Tab.Screen name="DashboardTab" component={DashboardStack} options={{ title: 'Dashboard' }} />
-      <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: 'Profil' }} />
+      <Tab.Screen name="ProfileTab" component={ProfileStack} options={{ title: 'Profil' }} />
     </Tab.Navigator>
   );
 }

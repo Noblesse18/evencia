@@ -1,33 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
+  Image,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const navigation = useNavigation();
   const [profile, setProfile] = useState(null);
+  const [inscriptions, setInscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [unsubscribing, setUnsubscribing] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await apiClient.get('/users/me');
-        setProfile(data);
-      } catch {
-        setProfile(user);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const loadData = async () => {
+    try {
+      const [profileRes, inscRes] = await Promise.all([
+        apiClient.get('/users/me').catch(() => null),
+        apiClient.get('/inscriptions/my').catch(() => null),
+      ]);
+      setProfile(profileRes?.data || user);
+      setInscriptions(Array.isArray(inscRes?.data) ? inscRes.data : []);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(useCallback(() => { setLoading(true); loadData(); }, []));
+
+  const handleUnsubscribe = (inscription) => {
+    Alert.alert(
+      'Se désinscrire',
+      `Voulez-vous vraiment vous désinscrire de "${inscription.event_title}" ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Se désinscrire',
+          style: 'destructive',
+          onPress: async () => {
+            setUnsubscribing(inscription.id);
+            try {
+              await apiClient.delete(`/inscriptions/${inscription.id}`);
+              setInscriptions((prev) => prev.filter((i) => i.id !== inscription.id));
+              Alert.alert('Succès', 'Vous avez été désinscrit.');
+            } catch (err) {
+              const msg = err.response?.data?.message || 'Erreur lors de la désinscription.';
+              Alert.alert('Erreur', msg);
+            } finally {
+              setUnsubscribing(null);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const handleLogout = () => {
     Alert.alert('Déconnexion', 'Voulez-vous vraiment vous déconnecter ?', [
@@ -56,6 +90,9 @@ export default function ProfileScreen() {
   };
 
   const role = roleBadge[data?.role] || roleBadge.participant;
+
+  const upcoming = inscriptions.filter((i) => new Date(i.event_date) >= new Date());
+  const past = inscriptions.filter((i) => new Date(i.event_date) < new Date());
 
   return (
     <ScrollView className="flex-1" style={{ backgroundColor: '#0a0a0f' }} contentContainerStyle={{ paddingBottom: 32 }}>
@@ -86,6 +123,53 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Mes inscriptions */}
+      <View className="px-4 mt-6">
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-lg font-bold text-white">Mes inscriptions</Text>
+          <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: '#1e293b' }}>
+            <Text className="text-xs font-medium text-amber-400">{inscriptions.length}</Text>
+          </View>
+        </View>
+
+        {inscriptions.length === 0 ? (
+          <View className="rounded-2xl p-6 items-center" style={{ backgroundColor: '#0f172a' }}>
+            <Ionicons name="calendar-outline" size={40} color="#475569" />
+            <Text className="text-slate-500 mt-2">Aucune inscription</Text>
+          </View>
+        ) : (
+          <>
+            {upcoming.length > 0 && (
+              <>
+                <Text className="text-sm font-semibold text-slate-400 mb-2">À venir</Text>
+                {upcoming.map((insc) => (
+                  <InscriptionCard
+                    key={insc.id}
+                    inscription={insc}
+                    onPress={() => navigation.navigate('EventDetail', { eventId: insc.event_id })}
+                    onUnsubscribe={() => handleUnsubscribe(insc)}
+                    isLoading={unsubscribing === insc.id}
+                  />
+                ))}
+              </>
+            )}
+            {past.length > 0 && (
+              <>
+                <Text className="text-sm font-semibold text-slate-400 mb-2 mt-3">Passés</Text>
+                {past.map((insc) => (
+                  <InscriptionCard
+                    key={insc.id}
+                    inscription={insc}
+                    isPast
+                    onPress={() => navigation.navigate('EventDetail', { eventId: insc.event_id })}
+                  />
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </View>
+
       {/* Actions */}
       <View className="px-4 mt-6">
         <Text className="text-lg font-bold text-white mb-3">Paramètres</Text>
@@ -111,6 +195,67 @@ export default function ProfileScreen() {
 
       <Text className="text-center text-xs text-slate-600 mt-6">Evencia Mobile v1.0.0</Text>
     </ScrollView>
+  );
+}
+
+function InscriptionCard({ inscription, onPress, onUnsubscribe, isLoading, isPast }) {
+  const dateStr = inscription.event_date
+    ? new Date(inscription.event_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+
+  return (
+    <TouchableOpacity
+      className={`rounded-2xl mb-3 overflow-hidden ${isPast ? 'opacity-60' : ''}`}
+      style={{ backgroundColor: '#0f172a' }}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <View className="flex-row">
+        {inscription.event_image_url ? (
+          <Image source={{ uri: inscription.event_image_url }} className="w-24 h-24" resizeMode="cover" />
+        ) : (
+          <View className="w-24 h-24 bg-amber-500 items-center justify-center">
+            <Ionicons name="calendar" size={28} color="#fff" />
+          </View>
+        )}
+        <View className="flex-1 p-3 justify-center">
+          <Text className="text-sm font-bold text-white mb-1" numberOfLines={1}>
+            {inscription.event_title}
+          </Text>
+          <View className="flex-row items-center mb-1">
+            <Ionicons name="calendar-outline" size={12} color="#f59e0b" />
+            <Text className="text-xs text-slate-400 ml-1">{dateStr}</Text>
+          </View>
+          <View className="flex-row items-center">
+            <Ionicons name="location-outline" size={12} color="#f59e0b" />
+            <Text className="text-xs text-slate-400 ml-1" numberOfLines={1}>
+              {inscription.event_location || '—'}
+            </Text>
+          </View>
+        </View>
+        <View className="justify-center pr-3">
+          {!isPast && onUnsubscribe ? (
+            <TouchableOpacity
+              className="px-3 py-1.5 rounded-full"
+              style={{ backgroundColor: '#450a0a' }}
+              onPress={onUnsubscribe}
+              disabled={isLoading}
+              activeOpacity={0.7}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#ef4444" />
+              ) : (
+                <Text className="text-xs font-medium text-red-400">Désinscrire</Text>
+              )}
+            </TouchableOpacity>
+          ) : (
+            <View className="px-2 py-1 rounded-full" style={{ backgroundColor: '#1e293b' }}>
+              <Text className="text-xs font-medium text-slate-400">Terminé</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }
 

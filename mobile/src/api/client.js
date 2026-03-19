@@ -1,10 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// pour emulateur android : 10.0.2.2:5000
-// pour appareil reel : ip de ma machine : 192.168.1.42/24
+// pour emulateur android : http://10.0.2.2:5000/api
+// pour appareil reel : http://192.168.47.150:5000/api
 
-const API_BASE_URL = 'http://10.0.2.2:5000/api'; // 10.0.2.2 = localhost du host dans l'emulateur Android
+const API_BASE_URL = 'http://192.168.47.150:5000/api';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
