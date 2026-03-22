@@ -1,0 +1,78 @@
+name: Evencia Local
+values:
+  - key: base_url
+    value: 'http://localhost:5000/api'
+    enabled: true
+    type: default
+  - key: participant_token
+    value: ''
+    enabled: true
+    type: default
+  - key: organizer_token
+    value: ''
+    enabled: true
+    type: default
+  - key: admin_token
+    value: ''
+    enabled: true
+    type: default
+  - key: participant_id
+    value: ''
+    enabled: true
+    type: default
+  - key: organizer_id
+    value: ''
+    enabled: true
+    type: default
+  - key: admin_id
+    value: ''
+    enabled: true
+    type: default
+  - key: event_id
+    value: ''
+    enabled: true
+    type: default
+  - key: paid_event_id
+    value: ''
+    enabled: true
+    type: default
+  - key: inscription_id
+    value: ''
+    enabled: true
+    type: default
+  - key: participant_email
+    value: 'test.participant@evencia.com'
+    enabled: true
+    type: default
+  - key: participant_password
+    value: 'ParticipantTest12'
+    enabled: true
+    type: default
+  - key: organizer_email
+    value: 'test.organizer@evencia.com'
+    enabled: true
+    type: default
+  - key: organizer_password
+    value: 'OrganizerTest12'
+    enabled: true
+    type: default
+  - key: admin_email
+    value: 'test.admin@evencia.com'
+    enabled: true
+    type: default
+  - key: admin_password
+    value: 'AdminTestPass12'
+    enabled: true
+    type: default
+  - key: new_password
+    value: 'NewSecurePass12'
+    enabled: true
+    type: default
+  - key: participant_name
+    value: 'Test Participant'
+    enabled: true
+    type: default
+  - key: organizer_name
+    value: 'Test Organizer'
+    enabled: true
+    type: default

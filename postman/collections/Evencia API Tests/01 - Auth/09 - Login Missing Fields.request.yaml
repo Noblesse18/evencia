@@ -1,0 +1,26 @@
+$kind: http-request
+name: 'Login Missing Fields (should fail)'
+method: POST
+url: '{{base_url}}/auth/login'
+order: 9000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{participant_email}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 400 Bad Request", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Response contains validation error", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });

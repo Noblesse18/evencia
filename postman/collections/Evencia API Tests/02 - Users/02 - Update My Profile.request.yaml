@@ -1,0 +1,35 @@
+$kind: http-request
+name: Update My Profile
+method: PUT
+url: '{{base_url}}/users/me'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "name": "Updated Participant Name"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Name was updated", function () {
+          const json = pm.response.json();
+          pm.expect(json.name).to.equal("Updated Participant Name");
+      });
+
+      pm.test("Other fields remain unchanged", function () {
+          const json = pm.response.json();
+          pm.expect(json.id).to.equal(pm.environment.get("participant_id"));
+          pm.expect(json.role).to.equal("participant");
+          pm.expect(json.email).to.equal(pm.environment.get("participant_email"));
+      });

@@ -1,0 +1,29 @@
+$kind: http-request
+name: Get User By ID
+method: GET
+url: '{{base_url}}/users/{{organizer_id}}'
+order: 3000
+headers:
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("User has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("id");
+          pm.expect(json).to.have.property("name");
+          pm.expect(json).to.have.property("email");
+          pm.expect(json).to.have.property("role");
+          pm.expect(json).to.have.property("created_at");
+      });
+
+      pm.test("Returned user matches requested ID", function () {
+          const json = pm.response.json();
+          pm.expect(json.id).to.equal(pm.environment.get("organizer_id"));
+      });

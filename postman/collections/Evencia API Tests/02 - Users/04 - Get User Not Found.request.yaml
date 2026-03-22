@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Get User Not Found (should fail)'
+method: GET
+url: '{{base_url}}/users/00000000-0000-0000-0000-000000000000'
+order: 4000
+headers:
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 404 Not Found", function () {
+          pm.response.to.have.status(404);
+      });
+
+      pm.test("Error message indicates user not found", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json.message.toLowerCase()).to.include("introuvable");
+      });

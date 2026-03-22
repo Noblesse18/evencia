@@ -1,0 +1,952 @@
+{
+	"info": {
+		"_postman_id": "evencia-api-tests",
+		"name": "Evencia API Tests",
+		"description": "Complete API test collection for the Evencia event management platform. Covers authentication, users, events, inscriptions, payments, and cleanup workflows.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000/api"
+		}
+	],
+	"item": [
+		{
+			"name": "01 - Auth",
+			"description": "Authentication tests: register, login, token verification, password management",
+			"item": [
+				{
+					"name": "Register Participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{participant_name}}\",\n  \"email\": \"{{participant_email}}\",\n  \"password\": \"{{participant_password}}\",\n  \"role\": \"participant\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test('Response has user object and token', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('user');",
+									"    pm.expect(json).to.have.property('token');",
+									"    pm.expect(json.token).to.be.a('string').and.not.empty;",
+									"});",
+									"pm.test('User has correct fields', function () {",
+									"    const user = pm.response.json().user;",
+									"    pm.expect(user).to.have.property('id');",
+									"    pm.expect(user).to.have.property('name', pm.environment.get('participant_name'));",
+									"    pm.expect(user).to.have.property('email', pm.environment.get('participant_email'));",
+									"    pm.expect(user).to.have.property('role', 'participant');",
+									"});",
+									"pm.test('Store participant token and ID', function () {",
+									"    const json = pm.response.json();",
+									"    pm.environment.set('participant_token', json.token);",
+									"    pm.environment.set('participant_id', json.user.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Register Organizer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{organizer_name}}\",\n  \"email\": \"{{organizer_email}}\",\n  \"password\": \"{{organizer_password}}\",\n  \"role\": \"organizer\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test('User role is organizer', function () {",
+									"    const user = pm.response.json().user;",
+									"    pm.expect(user.role).to.equal('organizer');",
+									"});",
+									"pm.test('Store organizer token and ID', function () {",
+									"    const json = pm.response.json();",
+									"    pm.environment.set('organizer_token', json.token);",
+									"    pm.environment.set('organizer_id', json.user.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Register Duplicate Email (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Duplicate User\",\n  \"email\": \"{{participant_email}}\",\n  \"password\": \"ParticipantTest12\",\n  \"role\": \"participant\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"pm.test('Error message indicates email already used', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('message');",
+									"    pm.expect(json.message.toLowerCase()).to.include('email');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Register Missing Fields (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"incomplete@evencia.com\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Register Weak Password (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Weak Password User\",\n  \"email\": \"weakpwd@evencia.com\",\n  \"password\": \"short\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login Participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{participant_email}}\",\n  \"password\": \"{{participant_password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Response has user and token', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('user');",
+									"    pm.expect(json).to.have.property('token');",
+									"});",
+									"pm.test('Update participant token', function () {",
+									"    const json = pm.response.json();",
+									"    pm.environment.set('participant_token', json.token);",
+									"    pm.environment.set('participant_id', json.user.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login Organizer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{organizer_email}}\",\n  \"password\": \"{{organizer_password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('User role is organizer', function () {",
+									"    const user = pm.response.json().user;",
+									"    pm.expect(user.role).to.equal('organizer');",
+									"});",
+									"pm.test('Update organizer token', function () {",
+									"    const json = pm.response.json();",
+									"    pm.environment.set('organizer_token', json.token);",
+									"    pm.environment.set('organizer_id', json.user.id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login Invalid Credentials (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{participant_email}}\",\n  \"password\": \"WrongPassword123\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 401 Unauthorized', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login Missing Fields (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{participant_email}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Verify Token Valid",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/auth/verify", "host": ["{{base_url}}"], "path": ["auth", "verify"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Token is valid', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('valid', true);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Verify Token Invalid (should fail)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer invalid.token.here" }
+						],
+						"url": { "raw": "{{base_url}}/auth/verify", "host": ["{{base_url}}"], "path": ["auth", "verify"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 401 Unauthorized', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Verify Token Missing (should fail)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/auth/verify", "host": ["{{base_url}}"], "path": ["auth", "verify"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 401 Unauthorized', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"oldPassword\": \"{{participant_password}}\",\n  \"newPassword\": \"{{new_password}}\",\n  \"confirmPassword\": \"{{new_password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/change-password", "host": ["{{base_url}}"], "path": ["auth", "change-password"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Update stored password', function () {",
+									"    pm.environment.set('participant_password', pm.environment.get('new_password'));",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Request Password Reset",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{participant_email}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/request-password-reset", "host": ["{{base_url}}"], "path": ["auth", "request-password-reset"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Reset Password Invalid Token (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"invalid-reset-token-12345\",\n  \"newPassword\": \"ResetPassword12\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/reset-password", "host": ["{{base_url}}"], "path": ["auth", "reset-password"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "02 - Users",
+			"description": "User profile management tests: get profile, update profile, get by ID",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Profile has required fields', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('id');",
+									"    pm.expect(json).to.have.property('name');",
+									"    pm.expect(json).to.have.property('email');",
+									"    pm.expect(json).to.have.property('role');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Participant Name\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/users/me", "host": ["{{base_url}}"], "path": ["users", "me"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Name was updated', function () {",
+									"    pm.expect(pm.response.json().name).to.equal('Updated Participant Name');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get User By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/users/{{organizer_id}}", "host": ["{{base_url}}"], "path": ["users", "{{organizer_id}}"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get User Not Found (should fail)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/users/00000000-0000-0000-0000-000000000000", "host": ["{{base_url}}"], "path": ["users", "00000000-0000-0000-0000-000000000000"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404 Not Found', function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get All Users Without Auth (should fail)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 401 or 403', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get All Users As Participant (should fail - admin only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 403 Forbidden', function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "03 - Events",
+			"description": "Event management tests: CRUD operations, filtering, search, organizer endpoints",
+			"item": [
+				{
+					"name": "Get Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events/categories", "host": ["{{base_url}}"], "path": ["events", "categories"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Response is an array of categories', function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Event (Free)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{organizer_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Test Free Event - Postman\",\n  \"description\": \"A free test event created by Postman automated tests.\",\n  \"category\": \"conference\",\n  \"location\": \"Paris, France\",\n  \"event_date\": \"2027-12-15T18:00:00.000Z\",\n  \"price\": 0,\n  \"max_tickets\": 100\n}"
+						},
+						"url": { "raw": "{{base_url}}/events", "host": ["{{base_url}}"], "path": ["events"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test('Store event ID', function () {",
+									"    pm.environment.set('event_id', pm.response.json().id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Event (Paid)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{organizer_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Test Paid Event - Postman\",\n  \"description\": \"A paid test event created by Postman automated tests.\",\n  \"category\": \"musique\",\n  \"location\": \"Lyon, France\",\n  \"event_date\": \"2027-12-20T20:00:00.000Z\",\n  \"price\": 25.50,\n  \"max_tickets\": 50\n}"
+						},
+						"url": { "raw": "{{base_url}}/events", "host": ["{{base_url}}"], "path": ["events"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test('Store paid event ID', function () {",
+									"    pm.environment.set('paid_event_id', pm.response.json().id);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Event As Participant (should fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{participant_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Unauthorized Event\",\n  \"description\": \"Should not be created.\",\n  \"category\": \"sport\",\n  \"location\": \"Marseille, France\",\n  \"event_date\": \"2027-12-25T10:00:00.000Z\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/events", "host": ["{{base_url}}"], "path": ["events"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 403 Forbidden', function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List All Events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events?include_past=true", "host": ["{{base_url}}"], "path": ["events"], "query": [{ "key": "include_past", "value": "true" }] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Response has events array and pagination', function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property('events');",
+									"    pm.expect(json).to.have.property('pagination');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Events With Filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events?category=conference&city=Paris&price_max=50&include_past=true", "host": ["{{base_url}}"], "path": ["events"], "query": [{ "key": "category", "value": "conference" }, { "key": "city", "value": "Paris" }, { "key": "price_max", "value": "50" }, { "key": "include_past", "value": "true" }] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Events With Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events?search=Postman&include_past=true", "host": ["{{base_url}}"], "path": ["events"], "query": [{ "key": "search", "value": "Postman" }, { "key": "include_past", "value": "true" }] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "List Events With Pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events?page=1&limit=2&include_past=true", "host": ["{{base_url}}"], "path": ["events"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "2" }, { "key": "include_past", "value": "true" }] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Pagination respects limit', function () {",
+									"    pm.expect(pm.response.json().events.length).to.be.at.most(2);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Event By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events/{{event_id}}", "host": ["{{base_url}}"], "path": ["events", "{{event_id}}"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Event Not Found",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/events/999999", "host": ["{{base_url}}"], "path": ["events", "999999"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404 Not Found', function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Event",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{organizer_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Free Event - Postman\",\n  \"description\": \"This event has been updated by Postman automated tests.\",\n  \"max_tickets\": 200\n}"
+						},
+						"url": { "raw": "{{base_url}}/events/{{event_id}}", "host": ["{{base_url}}"], "path": ["events", "{{event_id}}"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Event title was updated', function () {",
+									"    pm.expect(pm.response.json().title).to.include('Updated');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get My Events (Organizer)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{organizer_token}}" }
+						],
+						"url": { "raw": "{{base_url}}/events/my-events", "host": ["{{base_url}}"], "path": ["events", "my-events"] }
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "04 - Inscriptions",
+			"description": "Inscription/registration tests: create, list, cancel, error cases",
+			"item": []
+		},
+		{
+			"name": "05 - Payments",
+			"description": "Payment tests: checkout session creation, error cases",
+			"item": []
+		},
+		{
+			"name": "06 - Cleanup",
+			"description": "Cleanup requests to remove test data after test run",
+			"item": []
+		}
+	]
+}

@@ -1,0 +1,30 @@
+$kind: http-request
+name: List All Events
+method: GET
+url: '{{base_url}}/events'
+order: 5000
+queryParams:
+  - key: include_past
+    value: 'true'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has events array and pagination", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("events");
+          pm.expect(json.events).to.be.an("array");
+          pm.expect(json).to.have.property("pagination");
+      });
+
+      pm.test("Pagination has required fields", function () {
+          const pagination = pm.response.json().pagination;
+          pm.expect(pagination).to.have.property("page");
+          pm.expect(pagination).to.have.property("limit");
+          pm.expect(pagination).to.have.property("total");
+          pm.expect(pagination).to.have.property("totalPages");
+      });

@@ -1,0 +1,32 @@
+$kind: http-request
+name: 'Create Event As Participant (should fail)'
+method: POST
+url: '{{base_url}}/events'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Unauthorized Event",
+      "description": "This event should not be created because participants cannot create events.",
+      "category": "sport",
+      "location": "Marseille, France",
+      "event_date": "2027-12-25T10:00:00.000Z"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 403 Forbidden", function () {
+          pm.response.to.have.status(403);
+      });
+
+      pm.test("Participants cannot create events", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });

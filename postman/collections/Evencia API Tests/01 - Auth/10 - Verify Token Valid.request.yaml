@@ -1,0 +1,29 @@
+$kind: http-request
+name: Verify Token Valid
+method: GET
+url: '{{base_url}}/auth/verify'
+order: 10000
+headers:
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Token is valid", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("valid", true);
+      });
+
+      pm.test("User data is returned", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("user");
+          pm.expect(json.user).to.have.property("id");
+          pm.expect(json.user).to.have.property("name");
+          pm.expect(json.user).to.have.property("email");
+          pm.expect(json.user).to.have.property("role");
+      });

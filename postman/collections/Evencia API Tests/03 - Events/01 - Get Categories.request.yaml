@@ -1,0 +1,26 @@
+$kind: http-request
+name: Get Categories
+method: GET
+url: '{{base_url}}/events/categories'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array of categories", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.be.an("array");
+          pm.expect(json.length).to.be.greaterThan(0);
+      });
+
+      pm.test("Known categories are present", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.include("musique");
+          pm.expect(json).to.include("sport");
+          pm.expect(json).to.include("conference");
+          pm.expect(json).to.include("autre");
+      });

@@ -1,0 +1,30 @@
+$kind: http-request
+name: Get My Profile
+method: GET
+url: '{{base_url}}/users/me'
+order: 1000
+headers:
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Profile has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("id");
+          pm.expect(json).to.have.property("name");
+          pm.expect(json).to.have.property("email");
+          pm.expect(json).to.have.property("role");
+          pm.expect(json).to.have.property("created_at");
+      });
+
+      pm.test("Profile matches authenticated user", function () {
+          const json = pm.response.json();
+          pm.expect(json.id).to.equal(pm.environment.get("participant_id"));
+          pm.expect(json.role).to.equal("participant");
+      });

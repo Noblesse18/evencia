@@ -1,0 +1,28 @@
+$kind: http-request
+name: List Events With Search
+method: GET
+url: '{{base_url}}/events'
+order: 7000
+queryParams:
+  - key: search
+    value: Postman
+  - key: include_past
+    value: 'true'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Search results contain matching events", function () {
+          const events = pm.response.json().events;
+          pm.expect(events).to.be.an("array");
+          if (events.length > 0) {
+              events.forEach(function (event) {
+                  const titleOrDesc = (event.title + " " + event.description).toLowerCase();
+                  pm.expect(titleOrDesc).to.include("postman");
+              });
+          }
+      });

@@ -97,10 +97,38 @@
 
 ### Modalités d'accès aux productions et à leur documentation
 
-- La documentation technique de l'API (Swagger / OpenAPI 3) est accessible en local sur : http://localhost:5000/api-docs (ou en production : https://evencia.duckdns.org/api-docs)
-- Le code source complet (backend + frontend + mobile) : https://github.com/Noblesse18/evencia
-- Lancement via Docker : `docker compose up --build -d` à la racine du projet
-- Frontend : http://localhost:3000 | Backend : http://localhost:5000
+Le code source est accessible sur GitHub : https://github.com/Noblesse18/evencia
+
+Le fichier `README.md` à la racine contient les instructions d'installation et de lancement.
+
+La documentation technique et utilisateur est disponible dans le dossier `/docs` du dépôt :
+- `docs/documentation-technique.md` — Architecture, schéma BDD, endpoints API, sécurité
+- `docs/documentation-utilisateur.md` — Guide d'utilisation avec captures d'écran
+- `docs/evencia-postman-collection.json` — Collection de tests API Postman (importable)
+
+**Lancement du projet :**
+```
+git clone https://github.com/Noblesse18/evencia.git
+cd evencia
+docker compose up --build -d
+```
+
+**Accès à l'application :**
+
+| Service | URL |
+|---------|-----|
+| Frontend Web | http://localhost:3000 |
+| Backend API | http://localhost:5000/api |
+| Documentation Swagger | http://localhost:5000/api-docs |
+
+**Identifiants de test :**
+
+| Rôle | Email | Mot de passe |
+|------|-------|-------------|
+| Organisateur | comaravel@gmail.com | *(défini dans le seed)* |
+| Participant | *(créer via /register)* | — |
+
+**Carte de test Stripe** : `4242 4242 4242 4242` (date future quelconque, CVC quelconque)
 
 ---
 
@@ -457,10 +485,27 @@ Un fichier `docker-compose.prod.yml` existe pour le déploiement en production a
 
 ### Modalités d'accès aux productions et à leur documentation
 
-- La documentation technique du projet est disponible dans le dossier `docs/` du dépôt GitHub
-- Le code source complet (backend + frontend + mobile) : https://github.com/Noblesse18/evencia
-- L'application mobile se trouve dans le dossier `mobile/` du dépôt
-- Lancement : `cd mobile && npm install && npx expo start` puis appuyer sur `a` pour l'émulateur Android
+Le code source est accessible sur GitHub : https://github.com/Noblesse18/evencia
+
+Le fichier `README.md` à la racine contient les instructions d'installation et de lancement.
+
+La documentation technique et utilisateur est disponible dans le dossier `/docs` du dépôt :
+- `docs/documentation-technique.md` — Architecture, schéma BDD, endpoints API, sécurité
+- `docs/documentation-utilisateur.md` — Guide d'utilisation avec captures d'écran
+- `docs/evencia-postman-collection.json` — Collection de tests API Postman (importable)
+
+**L'application mobile** se trouve dans le dossier `mobile/` du dépôt.
+
+**Lancement :**
+1. Lancer le backend : `docker compose up --build -d` (à la racine)
+2. Lancer l'app mobile : `cd mobile && npm install && npx expo start` puis appuyer sur `a`
+
+**Identifiants de test :**
+
+| Rôle | Email | Mot de passe |
+|------|-------|-------------|
+| Organisateur | comaravel@gmail.com | *(défini dans le seed)* |
+| Participant | *(créer via /register)* | — |
 
 ---
 

@@ -1,0 +1,7 @@
+$kind: collection
+name: Evencia API Tests
+description: Complete API test collection for the Evencia event management
+  platform. Covers authentication, users, events, inscriptions, payments, and
+  cleanup workflows.
+variables:
+  base_url: http://localhost:5000/api

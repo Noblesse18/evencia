@@ -1,0 +1,46 @@
+$kind: http-request
+name: Register Participant
+method: POST
+url: '{{base_url}}/auth/register'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{participant_name}}",
+      "email": "{{participant_email}}",
+      "password": "{{participant_password}}",
+      "role": "participant"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has user object and token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("user");
+          pm.expect(json).to.have.property("token");
+          pm.expect(json.token).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("User has correct fields", function () {
+          const user = pm.response.json().user;
+          pm.expect(user).to.have.property("id");
+          pm.expect(user).to.have.property("name", pm.environment.get("participant_name"));
+          pm.expect(user).to.have.property("email", pm.environment.get("participant_email"));
+          pm.expect(user).to.have.property("role", "participant");
+          pm.expect(user).to.have.property("created_at");
+      });
+
+      pm.test("Store participant token and ID", function () {
+          const json = pm.response.json();
+          pm.environment.set("participant_token", json.token);
+          pm.environment.set("participant_id", json.user.id);
+      });

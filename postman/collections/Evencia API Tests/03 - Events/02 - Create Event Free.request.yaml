@@ -1,0 +1,47 @@
+$kind: http-request
+name: Create Event (Free)
+method: POST
+url: '{{base_url}}/events'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{organizer_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Test Free Event - Postman",
+      "description": "A free test event created by Postman automated tests for the Evencia platform.",
+      "category": "conference",
+      "location": "Paris, France",
+      "event_date": "2027-12-15T18:00:00.000Z",
+      "price": 0,
+      "max_tickets": 100
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Event has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("id");
+          pm.expect(json).to.have.property("title", "Test Free Event - Postman");
+          pm.expect(json).to.have.property("category", "conference");
+          pm.expect(json).to.have.property("location", "Paris, France");
+      });
+
+      pm.test("Price is 0 for free event", function () {
+          const json = pm.response.json();
+          pm.expect(parseFloat(json.price)).to.equal(0);
+      });
+
+      pm.test("Store event ID", function () {
+          const json = pm.response.json();
+          pm.environment.set("event_id", json.id);
+      });

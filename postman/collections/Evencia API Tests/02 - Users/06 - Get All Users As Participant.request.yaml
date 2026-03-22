@@ -1,0 +1,20 @@
+$kind: http-request
+name: 'Get All Users As Participant (should fail - admin only)'
+method: GET
+url: '{{base_url}}/users'
+order: 6000
+headers:
+  - key: Authorization
+    value: 'Bearer {{participant_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 403 Forbidden", function () {
+          pm.response.to.have.status(403);
+      });
+
+      pm.test("Non-admin cannot list all users", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });

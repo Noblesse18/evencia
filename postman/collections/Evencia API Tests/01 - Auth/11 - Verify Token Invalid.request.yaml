@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Verify Token Invalid (should fail)'
+method: GET
+url: '{{base_url}}/auth/verify'
+order: 11000
+headers:
+  - key: Authorization
+    value: 'Bearer invalid.token.here'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 401 Unauthorized", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Error message indicates invalid token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json.message.toLowerCase()).to.include("token");
+      });

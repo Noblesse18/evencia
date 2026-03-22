@@ -1,0 +1,17 @@
+$kind: http-request
+name: 'Get All Users Without Auth (should fail)'
+method: GET
+url: '{{base_url}}/users'
+order: 5000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 401 or 403", function () {
+          pm.expect(pm.response.code).to.be.oneOf([401, 403]);
+      });
+
+      pm.test("Access denied without authentication", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+      });

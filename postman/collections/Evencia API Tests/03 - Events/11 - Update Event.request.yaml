@@ -1,0 +1,35 @@
+$kind: http-request
+name: Update Event
+method: PUT
+url: '{{base_url}}/events/{{free_event_id}}'
+order: 11000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{organizer_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Updated Free Event - Postman",
+      "description": "This event has been updated by Postman automated tests.",
+      "max_tickets": 200
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Event title was updated", function () {
+          const json = pm.response.json();
+          pm.expect(json.title).to.include("Updated");
+      });
+
+      pm.test("Max tickets was updated", function () {
+          const json = pm.response.json();
+          pm.expect(json.max_tickets).to.equal(200);
+      });

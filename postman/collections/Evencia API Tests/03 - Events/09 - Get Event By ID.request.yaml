@@ -1,0 +1,28 @@
+$kind: http-request
+name: Get Event By ID
+method: GET
+url: '{{base_url}}/events/{{free_event_id}}'
+order: 9000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Event has required fields", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("id");
+          pm.expect(json).to.have.property("title");
+          pm.expect(json).to.have.property("description");
+          pm.expect(json).to.have.property("category");
+          pm.expect(json).to.have.property("location");
+          pm.expect(json).to.have.property("event_date");
+          pm.expect(json).to.have.property("organizer_id");
+      });
+
+      pm.test("Event ID matches requested ID", function () {
+          const json = pm.response.json();
+          pm.expect(json.id.toString()).to.equal(pm.environment.get("free_event_id"));
+      });

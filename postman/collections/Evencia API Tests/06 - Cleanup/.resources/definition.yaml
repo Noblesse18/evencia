@@ -1,0 +1,4 @@
+$kind: collection
+name: '06 - Cleanup'
+description: 'Cleanup requests to remove test data after test run'
+order: 6000

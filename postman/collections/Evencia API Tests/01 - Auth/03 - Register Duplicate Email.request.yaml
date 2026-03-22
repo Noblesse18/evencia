@@ -1,0 +1,30 @@
+$kind: http-request
+name: 'Register Duplicate Email (should fail)'
+method: POST
+url: '{{base_url}}/auth/register'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Duplicate User",
+      "email": "{{participant_email}}",
+      "password": "ParticipantTest12",
+      "role": "participant"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 400 Bad Request", function () {
+          pm.response.to.have.status(400);
+      });
+
+      pm.test("Error message indicates email already used", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json.message.toLowerCase()).to.include("email");
+      });

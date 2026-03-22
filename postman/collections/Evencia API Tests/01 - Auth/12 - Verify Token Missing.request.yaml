@@ -1,0 +1,18 @@
+$kind: http-request
+name: 'Verify Token Missing (should fail)'
+method: GET
+url: '{{base_url}}/auth/verify'
+order: 12000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 401 Unauthorized", function () {
+          pm.response.to.have.status(401);
+      });
+
+      pm.test("Error message indicates missing token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("message");
+          pm.expect(json.message.toLowerCase()).to.include("token");
+      });

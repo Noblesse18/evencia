@@ -1,0 +1,4 @@
+$kind: collection
+name: '02 - Users'
+description: 'User profile management tests: get profile, update profile, get by ID'
+order: 2000

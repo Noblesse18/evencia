@@ -1,0 +1,42 @@
+$kind: http-request
+name: Login Participant
+method: POST
+url: '{{base_url}}/auth/login'
+order: 6000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{participant_email}}",
+      "password": "{{participant_password}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has user and token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("user");
+          pm.expect(json).to.have.property("token");
+          pm.expect(json.token).to.be.a("string").and.not.empty;
+      });
+
+      pm.test("User data is correct", function () {
+          const user = pm.response.json().user;
+          pm.expect(user).to.have.property("id");
+          pm.expect(user).to.have.property("email", pm.environment.get("participant_email"));
+          pm.expect(user).to.have.property("role", "participant");
+      });
+
+      pm.test("Update participant token", function () {
+          const json = pm.response.json();
+          pm.environment.set("participant_token", json.token);
+          pm.environment.set("participant_id", json.user.id);
+      });

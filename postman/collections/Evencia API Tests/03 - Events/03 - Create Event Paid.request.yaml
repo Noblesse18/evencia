@@ -1,0 +1,39 @@
+$kind: http-request
+name: Create Event (Paid)
+method: POST
+url: '{{base_url}}/events'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Authorization
+    value: 'Bearer {{organizer_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Test Paid Event - Postman",
+      "description": "A paid test event created by Postman automated tests for the Evencia platform.",
+      "category": "musique",
+      "location": "Lyon, France",
+      "event_date": "2027-12-20T20:00:00.000Z",
+      "price": 25.50,
+      "max_tickets": 50
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Event has correct price", function () {
+          const json = pm.response.json();
+          pm.expect(parseFloat(json.price)).to.equal(25.50);
+      });
+
+      pm.test("Store paid event ID", function () {
+          const json = pm.response.json();
+          pm.environment.set("paid_event_id", json.id);
+      });

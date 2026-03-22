@@ -1,0 +1,43 @@
+$kind: http-request
+name: Register Organizer
+method: POST
+url: '{{base_url}}/auth/register'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{organizer_name}}",
+      "email": "{{organizer_email}}",
+      "password": "{{organizer_password}}",
+      "role": "organizer"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+
+      pm.test("Response has user object and token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("user");
+          pm.expect(json).to.have.property("token");
+      });
+
+      pm.test("User role is organizer", function () {
+          const user = pm.response.json().user;
+          pm.expect(user.role).to.equal("organizer");
+          pm.expect(user.name).to.equal(pm.environment.get("organizer_name"));
+          pm.expect(user.email).to.equal(pm.environment.get("organizer_email"));
+      });
+
+      pm.test("Store organizer token and ID", function () {
+          const json = pm.response.json();
+          pm.environment.set("organizer_token", json.token);
+          pm.environment.set("organizer_id", json.user.id);
+      });

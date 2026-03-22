@@ -1,0 +1,4 @@
+$kind: collection
+name: '04 - Inscriptions'
+description: 'Inscription/registration tests: create, list, cancel, error cases'
+order: 4000

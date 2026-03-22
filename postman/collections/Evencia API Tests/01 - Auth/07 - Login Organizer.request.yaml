@@ -1,0 +1,39 @@
+$kind: http-request
+name: Login Organizer
+method: POST
+url: '{{base_url}}/auth/login'
+order: 7000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "{{organizer_email}}",
+      "password": "{{organizer_password}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has user and token", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("user");
+          pm.expect(json).to.have.property("token");
+      });
+
+      pm.test("User role is organizer", function () {
+          const user = pm.response.json().user;
+          pm.expect(user.role).to.equal("organizer");
+      });
+
+      pm.test("Update organizer token", function () {
+          const json = pm.response.json();
+          pm.environment.set("organizer_token", json.token);
+          pm.environment.set("organizer_id", json.user.id);
+      });

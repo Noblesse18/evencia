@@ -1,0 +1,26 @@
+$kind: http-request
+name: List Events With Pagination
+method: GET
+url: '{{base_url}}/events'
+order: 8000
+queryParams:
+  - key: page
+    value: '1'
+  - key: limit
+    value: '2'
+  - key: include_past
+    value: 'true'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Pagination respects limit", function () {
+          const json = pm.response.json();
+          pm.expect(json.events.length).to.be.at.most(2);
+          pm.expect(json.pagination.page).to.equal(1);
+          pm.expect(json.pagination.limit).to.equal(2);
+      });

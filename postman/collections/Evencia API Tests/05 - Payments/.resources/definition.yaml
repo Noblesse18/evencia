@@ -1,0 +1,4 @@
+$kind: collection
+name: '05 - Payments'
+description: 'Payment tests: checkout session creation, error cases'
+order: 5000

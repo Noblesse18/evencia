@@ -1,0 +1,35 @@
+$kind: http-request
+name: List Events With Filters
+method: GET
+url: '{{base_url}}/events'
+order: 6000
+queryParams:
+  - key: category
+    value: conference
+  - key: city
+    value: Paris
+  - key: price_max
+    value: '50'
+  - key: include_past
+    value: 'true'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response has events array", function () {
+          const json = pm.response.json();
+          pm.expect(json).to.have.property("events");
+          pm.expect(json.events).to.be.an("array");
+      });
+
+      pm.test("Filtered events match criteria", function () {
+          const events = pm.response.json().events;
+          events.forEach(function (event) {
+              pm.expect(event.category).to.equal("conference");
+              pm.expect(event.location.toLowerCase()).to.include("paris");
+          });
+      });

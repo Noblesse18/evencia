@@ -1,0 +1,31 @@
+$kind: http-request
+name: Get My Events (Organizer)
+method: GET
+url: '{{base_url}}/events/my-events'
+order: 12000
+headers:
+  - key: Authorization
+    value: 'Bearer {{organizer_token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status code is 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test("Response is an array of events", function () {
+          const json = pm.response.json();
+          const events = Array.isArray(json) ? json : json.events;
+          pm.expect(events).to.be.an("array");
+          pm.expect(events.length).to.be.at.least(1);
+      });
+
+      pm.test("Events belong to the organizer", function () {
+          const json = pm.response.json();
+          const events = Array.isArray(json) ? json : json.events;
+          const organizerId = pm.environment.get("organizer_id");
+          events.forEach(function (event) {
+              pm.expect(event.organizer_id.toString()).to.equal(organizerId);
+          });
+      });
