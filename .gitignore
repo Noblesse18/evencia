@@ -4,3 +4,5 @@ node_modules/
 .DS_Store
 entrainement/
 ssh/
+docs/deploiement-vercel-render.md
+docs/guide.md

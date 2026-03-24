@@ -129,6 +129,20 @@ evencia/
 
 ---
 
+## Accès en ligne (Production)
+
+Le projet est déployé et accessible en ligne :
+
+| Service | URL |
+|---------|-----|
+| **Frontend** | https://evencia-v2.vercel.app |
+| **Backend API** | https://evencia.onrender.com/api |
+| **Swagger** | https://evencia.onrender.com/api-docs |
+
+> **Note importante** : le backend est hébergé sur Render (plan gratuit). Après une période d'inactivité (~15 minutes), le serveur se met en veille. La **première requête** peut prendre **30 à 50 secondes** le temps que le serveur redémarre. Les requêtes suivantes sont instantanées. Merci de patienter lors du premier chargement.
+
+---
+
 ## Documentation
 
 La documentation complète est disponible dans le dossier [`/docs`](docs/README.md) :
