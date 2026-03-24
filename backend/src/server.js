@@ -34,6 +34,7 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log(`[CORS] Origin rejetee: "${origin}" | Autorisees: ${JSON.stringify(allowedOrigins)}`);
       callback(new Error('Non autoriser par CORS'));
     }
   },
