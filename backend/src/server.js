@@ -22,8 +22,8 @@ const corsOptions = {
       .split(',')
       .map(o => o.trim());
 
-    // Autoriser les requetes sans origin (Postman, curl, etc.) en dev uniquement
-    if (!origin && process.env.NODE_ENV === 'development') {
+    // Autoriser les requetes sans origin (health checks Render, Swagger, etc.)
+    if (!origin) {
       return callback(null, true);
     }
 
