@@ -209,8 +209,9 @@ Pour tester le paiement en mode test :
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| **Organisateur** | comaravel@gmail.com | *(défini dans le seed de la base)* |
-| **Participant** | *(créer un compte via la page d'inscription)* | — |
+| **Administrateur** | admin@evencia.fr | Evencia2026! |
+| **Organisateur** | organisateur@evencia.fr | Evencia2026! |
+| **Participant** | participant@evencia.fr | Evencia2026! |
 
 ### Documentation API interactive
 

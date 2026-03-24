@@ -125,8 +125,9 @@ docker compose up --build -d
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Organisateur | comaravel@gmail.com | *(défini dans le seed)* |
-| Participant | *(créer via /register)* | — |
+| Administrateur | admin@evencia.fr | Evencia2026! |
+| Organisateur | organisateur@evencia.fr | Evencia2026! |
+| Participant | participant@evencia.fr | Evencia2026! |
 
 **Carte de test Stripe** : `4242 4242 4242 4242` (date future quelconque, CVC quelconque)
 
@@ -504,8 +505,9 @@ La documentation technique et utilisateur est disponible dans le dossier `/docs`
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Organisateur | comaravel@gmail.com | *(défini dans le seed)* |
-| Participant | *(créer via /register)* | — |
+| Administrateur | admin@evencia.fr | Evencia2026! |
+| Organisateur | organisateur@evencia.fr | Evencia2026! |
+| Participant | participant@evencia.fr | Evencia2026! |
 
 ---
 

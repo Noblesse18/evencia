@@ -282,9 +282,9 @@ Comptes de test :
 ┌──────────────┬───────────────────────┬────────────────────┐
 │ Rôle         │ Email                 │ Mot de passe       │
 ├──────────────┼───────────────────────┼────────────────────┤
-│ Admin        │ admin@evencia.com     │ (défini dans seed) │
-│ Organisateur │ (créer via /register) │ —                  │
-│ Participant  │ (créer via /register) │ —                  │
+│ Admin        │ admin@evencia.fr          │ Evencia2026!       │
+│ Organisateur │ organisateur@evencia.fr   │ Evencia2026!       │
+│ Participant  │ participant@evencia.fr    │ Evencia2026!       │
 └──────────────┴───────────────────────┴────────────────────┘
 
 Carte de test Stripe : 4242 4242 4242 4242 (date future, CVC quelconque)

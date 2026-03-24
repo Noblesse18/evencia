@@ -83,7 +83,7 @@ export default function AdminDashboard() {
         eventsAPI.getAll(),
       ]);
       setUsers(usersRes.data);
-      setEvents(eventsRes.data);
+      setEvents(eventsRes.data.events || eventsRes.data);
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error);
     } finally {

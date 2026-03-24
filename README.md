@@ -8,8 +8,12 @@ Application web et mobile fullstack permettant aux organisateurs de créer et g�
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| **Organisateur** | comaravel@gmail.com | *(défini dans le seed)* |
-| **Participant** | *(créer un compte via /register)* | — |
+| **Administrateur** | admin@evencia.fr | Evencia2026! |
+| **Organisateur** | organisateur@evencia.fr | Evencia2026! |
+| **Participant** | participant@evencia.fr | Evencia2026! |
+
+> Ces comptes sont créés automatiquement au premier lancement via Docker.
+> Pour les recréer manuellement : `cd backend && npm run seed`
 
 **Carte de test Stripe** : `4242 4242 4242 4242` (date future quelconque, CVC quelconque)
 
@@ -46,6 +50,11 @@ cd evencia
 ```bash
 docker compose up --build -d
 ```
+
+> Au premier lancement, la base MySQL est initialisée avec le schéma et un jeu de données de test
+> (3 utilisateurs, 5 événements, inscriptions et paiements).
+> Si la base existe déjà et que vous voulez la réinitialiser :
+> `docker compose down -v && docker compose up --build -d`
 
 ### 3. Vérifier que tout fonctionne
 
@@ -107,7 +116,7 @@ evencia/
 │       ├── screens/       # Écrans (Login, Home, Search, EventDetail, Dashboard, Profile)
 │       ├── contexts/      # AuthContext (gestion JWT + AsyncStorage)
 │       └── services/      # Client API Axios
-├── postman/           # Collection de tests API Postman
+├── postman/           # Collections de tests API Postman (42 tests)
 ├── docs/              # Documentation complète du projet
 │   ├── README.md              # Index de la documentation
 │   ├── documentation-technique.md   # Architecture, BDD, API, sécurité

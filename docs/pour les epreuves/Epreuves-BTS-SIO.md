@@ -131,8 +131,9 @@ Conception et développement d'une application web et mobile de gestion d'évén
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Admin | admin@evencia.com | *(défini dans seed)* |
-| Participant | *(créer via inscription)* | — |
+| Administrateur | admin@evencia.fr | Evencia2026! |
+| Organisateur | organisateur@evencia.fr | Evencia2026! |
+| Participant | participant@evencia.fr | Evencia2026! |
 
 **Carte de test Stripe :** `4242 4242 4242 4242` (date future quelconque, CVC quelconque)
 
