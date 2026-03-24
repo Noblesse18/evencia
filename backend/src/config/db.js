@@ -3,9 +3,13 @@ const mysql = require('mysql2/promise');
 const { drizzle } = require('drizzle-orm/mysql2');
 require('dotenv').config();
 
-const sslConfig = process.env.DB_CA_CERT
-  ? { ssl: { ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'), rejectUnauthorized: true } }
-  : {};
+const getSslConfig = () => {
+  if (process.env.NODE_ENV !== 'production') return {};
+  if (process.env.DB_CA_CERT) {
+    return { ssl: { ca: process.env.DB_CA_CERT.replace(/\\n/g, '\n'), rejectUnauthorized: true } };
+  }
+  return { ssl: { rejectUnauthorized: false } };
+};
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -17,7 +21,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true,
-  ...sslConfig,
+  ...getSslConfig(),
 });
 
 const db = drizzle(pool);
