@@ -13,7 +13,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true,
-  ...(process.env.NODE_ENV === 'production' && { ssl: { rejectUnauthorized: true } }),
+  ...(process.env.NODE_ENV === 'production' && { ssl: { rejectUnauthorized: false } }),
 });
 
 const db = drizzle(pool);
