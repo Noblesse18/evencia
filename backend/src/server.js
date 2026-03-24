@@ -15,6 +15,10 @@ const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 const corsOptions = {
   origin: function (origin, callback) {
     // liste des origines autorisees depuis .env
