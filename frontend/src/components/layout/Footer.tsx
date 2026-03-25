@@ -56,7 +56,7 @@ export default function Footer() {
               </li>
             </ul>
             <div className="flex gap-3 mt-4">
-              <a href="https://noblesse18.github.io" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+              <a href="https://noblesse18.github.io/portfolio-bts/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
                 <Globe className="w-5 h-5" />
               </a>
               <a href="https://github.com/Noblesse18/evencia" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
