@@ -78,7 +78,7 @@ app.use('/api/auth/reset-password', authLimiter);
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/payments/webhook') {
-    next();
+    express.raw({ type: 'application/json' })(req, res, next);
   } else {
     express.json()(req, res, next);
   }
