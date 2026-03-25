@@ -22,7 +22,7 @@ async function createInscription(req, res, next) {
     // Vérifier s'il reste des places
     if (event.max_tickets) {
       const [countResult] = await pool.execute(
-        'SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = "confirmed"',
+        "SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = 'confirmed'",
         [event_id]
       );
       if (countResult[0].count >= event.max_tickets) {

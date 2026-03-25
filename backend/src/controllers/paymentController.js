@@ -53,7 +53,7 @@ async function createCheckoutSession(req, res, next) {
     // Vérifier les places disponibles
     if (event.max_tickets) {
       const [countResult] = await pool.execute(
-        'SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = "confirmed"',
+        "SELECT COUNT(*) as count FROM inscriptions WHERE event_id = ? AND status = 'confirmed'",
         [event_id]
       );
       if (countResult[0].count >= event.max_tickets) {
@@ -70,7 +70,7 @@ async function createCheckoutSession(req, res, next) {
 
     if (!stripe) {
       // Mode dev sans Stripe : confirmer directement
-      await pool.execute('UPDATE inscriptions SET status = "confirmed" WHERE id = ?', [inscriptionId]);
+      await pool.execute("UPDATE inscriptions SET status = 'confirmed' WHERE id = ?", [inscriptionId]);
       return res.json({
         url: `${FRONTEND_URL}/events/${event_id}?payment=success`,
         warning: 'Stripe non configuré. Inscription confirmée directement.'
@@ -130,7 +130,7 @@ async function handleWebhook(req, res) {
     try {
       // Confirmer l'inscription
       await pool.execute(
-        'UPDATE inscriptions SET status = "confirmed" WHERE id = ?',
+        "UPDATE inscriptions SET status = 'confirmed' WHERE id = ?",
         [inscription_id]
       );
 
