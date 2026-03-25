@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Calendar, Github, Twitter, Mail } from 'lucide-react';
+import { Calendar, Github, Globe, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -56,10 +56,10 @@ export default function Footer() {
               </li>
             </ul>
             <div className="flex gap-3 mt-4">
-              <a href="#" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
-                <Twitter className="w-5 h-5" />
+              <a href="https://noblesse18.github.io" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+                <Globe className="w-5 h-5" />
               </a>
-              <a href="#" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+              <a href="https://github.com/Noblesse18/evencia" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
                 <Github className="w-5 h-5" />
               </a>
             </div>
