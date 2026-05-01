@@ -327,3 +327,115 @@ La collection Postman complète est disponible dans [`docs/evencia-postman-colle
 | `STRIPE_SECRET_KEY` | Clé secrète Stripe | *(mode test)* |
 | `STRIPE_WEBHOOK_SECRET` | Secret webhook Stripe | *(fourni par Stripe CLI)* |
 | `FRONTEND_URL` | URL du frontend | `http://localhost:3000` |
+
+---
+
+## 11. Choix des dépendances (justification)
+
+Cette section explique **pourquoi** chaque dépendance a été choisie dans le projet (web, mobile, backend).
+
+### Backend (`backend/package.json`)
+
+#### Dépendances
+
+- **express** : framework HTTP minimal et très répandu, idéal pour exposer une API REST claire avec middlewares (auth, validation, rate-limit…).
+- **mysql2** : driver MySQL performant avec support des pools et des requêtes paramétrées (sécurité contre l’injection SQL).
+- **drizzle-orm** : ORM léger orienté schémas, utilisé pour structurer les tables et faciliter l’évolution du modèle sans complexité excessive.
+- **bcrypt** : référence pour le **hashage sécurisé** des mots de passe (salt + coût configurable).
+- **jsonwebtoken** : génération/vérification de JWT pour une authentification stateless adaptée à une API REST.
+- **express-validator** : validation des entrées côté serveur (formats, longueurs, règles métier basiques) avant d’atteindre la logique métier.
+- **cors** : contrôle explicite des origines autorisées entre frontend/mobile et API.
+- **express-rate-limit** : limitation de débit pour réduire le risque de brute force et d’abus (notamment sur `/auth`).
+- **dotenv** : chargement des variables d’environnement en local (cohérent avec Docker/Render où les vars sont injectées).
+- **swagger-jsdoc** : génération de la spécification OpenAPI depuis la configuration JSDoc.
+- **swagger-ui-express** : interface Swagger UI servie par Express pour tester/documenter l’API.
+- **stripe** : SDK officiel Stripe pour Checkout et webhooks (fiable, maintenu, conforme aux bonnes pratiques Stripe).
+- **uuid** : génération d’identifiants uniques (utile pour des IDs non-séquentiels, pratiques à exposer publiquement).
+- **axios** : utilisé pour effectuer certains appels HTTP sortants si nécessaire (ex. services externes). Le projet l’utilise aussi côté clients, ce qui garde une cohérence d’usage.
+
+#### Dépendances de développement
+
+- **nodemon** : relance automatique du serveur en développement pour accélérer le cycle de dev.
+- **jest** : framework de tests (unitaires) simple à mettre en place sur Node.
+- **supertest** : tests d’intégration HTTP sur l’API Express (requêtes simulées + assertions).
+- **drizzle-kit** : outils CLI associés à Drizzle (génération/gestion autour du schéma et workflows de DB).
+- **@faker-js/faker** : génération de données réalistes pour seed/tests (évite des jeux de données “fake” trop simplistes).
+- **tsx** : exécution rapide de scripts TypeScript (utile pour scripts/outils sans step de build lourd).
+- **install** : utilitaire npm parfois ajouté automatiquement dans certains workflows ; **non indispensable** au fonctionnement applicatif (peut être retiré si inutile).
+
+### Frontend web (`frontend/package.json`)
+
+#### Dépendances
+
+- **next** : framework React complet (App Router, SSR/SSG, routing, optimisations) adapté à une app web moderne.
+- **react / react-dom** : cœur du rendu UI et de l’écosystème composant.
+- **zustand** : state management minimaliste et ergonomique (moins de boilerplate qu’un store plus lourd, suffisant pour auth/user/panier/filtre…).
+- **axios** : client HTTP pratique (interceptors pour JWT/401, baseURL, gestion d’erreurs).
+- **@stripe/stripe-js** : intégration Stripe côté navigateur (chargement sécurisé de Stripe.js).
+- **tailwindcss** : productivité UI via classes utilitaires, design cohérent, itération rapide.
+- **framer-motion** : animations fluides et déclaratives pour améliorer l’UX.
+- **lucide-react** : bibliothèque d’icônes moderne, légère et cohérente visuellement.
+- **clsx** : composition conditionnelle des classes (particulièrement utile avec Tailwind).
+- **date-fns** : manipulation/formatage des dates avec API simple (plus léger que des libs historiques).
+
+#### Dépendances de développement
+
+- **typescript** : typage statique pour réduire les bugs et améliorer l’autocomplétion.
+- **eslint** + **eslint-config-next** : linting + règles adaptées à Next pour garder une base de code homogène.
+- **@types/node / @types/react / @types/react-dom** : types nécessaires à TypeScript.
+- **@tailwindcss/postcss** : intégration Tailwind dans la chaîne PostCSS.
+- **babel-plugin-react-compiler** : compatibilité/outillage autour du React Compiler (optimisations/expérimentation selon le setup).
+
+### Mobile (`mobile/package.json`)
+
+#### Dépendances
+
+- **expo** : accélère le développement React Native (tooling, build, OTA, modules) sans config native lourde.
+- **react / react-native** : base de l’app mobile.
+- **@react-navigation/native** + **native-stack** + **bottom-tabs** : navigation standard (stack + tabs) stable, maintenue, adaptée au parcours décrit dans la doc.
+- **@react-native-async-storage/async-storage** : persistance locale (token, préférences) de façon fiable.
+- **axios** : client HTTP partagé avec le web (mêmes patterns d’interceptors/erreurs).
+- **nativewind** : approche Tailwind-like sur React Native, cohérente avec le web (réutilisation des réflexes de design).
+- **react-native-reanimated** : animations performantes (sur le thread UI), standard de facto pour RN.
+- **react-native-safe-area-context** : gestion correcte des safe areas (encoches, barres système).
+- **react-native-screens** : améliore performance/mémoire de la navigation via l’optimisation des écrans natifs.
+- **expo-status-bar** : contrôle simple de la barre de statut (lisibilité, thèmes).
+- **babel-preset-expo** : preset Babel recommandé par Expo (compatibilité/transpilation).
+- **tailwindcss** : utilisé pour la configuration des tokens/classes avec NativeWind (même vocabulaire que sur le web).
+
+---
+
+## 12. Version “oral BTS” — pourquoi ce choix et pas une autre
+
+Objectif à l’oral : montrer que les choix sont **cohérents**, **réalistes**, et adaptés au **temps/profil BTS** (aller vite, rester robuste, éviter la sur-architecture).
+
+### Backend (API)
+
+- **Express plutôt que NestJS/Spring** : Express est plus simple et rapide à mettre en place. NestJS apporte une structure “entreprise” (décorateurs, injection, modules) mais c’est plus long à configurer et à apprendre pour un projet BTS. Spring est très solide mais beaucoup plus lourd pour ce besoin.
+- **MySQL plutôt que MongoDB/PostgreSQL** : on a un modèle relationnel clair (users, events, inscriptions, payments) avec contraintes (FK, uniques). MySQL est très courant, simple à héberger et adapté au relationnel. MongoDB est moins naturel quand on a beaucoup de relations. PostgreSQL est excellent aussi, mais MySQL suffisait et plus “classique” dans ce contexte.
+- **mysql2 plutôt que “raw mysql”** : `mysql2` est un driver moderne, rapide, et surtout il facilite le **pool** et les **requêtes paramétrées** (sécurité).
+- **Drizzle plutôt que Prisma/Sequelize** : Drizzle est léger et “proche du SQL”, donc on garde la maîtrise. Prisma est très confortable mais ajoute une couche plus grosse (génération, client, workflow) et peut être trop “magique” pour expliquer à l’oral. Sequelize est plus ancien et peut devenir verbeux.
+- **JWT plutôt que sessions serveur** : JWT est pratique pour plusieurs clients (web + mobile) sans stocker de session côté serveur. Les sessions serveur sont très bien aussi, mais demandent un stockage (Redis/DB) et de la gestion supplémentaire.
+- **bcrypt plutôt que SHA256** : SHA256 n’est pas fait pour des mots de passe (trop rapide). bcrypt est conçu pour ça (salt + coût), donc plus sûr.
+- **express-validator plutôt que du “if” partout** : on centralise la validation, on évite de dupliquer les contrôles dans chaque controller, et on renvoie des erreurs propres.
+- **Swagger (swagger-jsdoc + swagger-ui-express) plutôt qu’un PDF** : Swagger permet de tester l’API en direct, c’est plus parlant à l’oral et plus pratique pour le frontend/mobile.
+- **Stripe SDK plutôt que “paiement maison”** : Stripe est une solution reconnue et sécurisée. Faire un paiement “maison” est risqué et irréaliste.
+- **Rate limit + CORS** : ce sont des mesures simples à justifier à l’oral pour montrer que l’API n’est pas “ouverte à tout”.
+
+### Frontend web
+
+- **Next.js plutôt que React (Vite) “pur”** : Next apporte le routing, les optimisations et un cadre clair (App Router). Vite + React fonctionne très bien, mais Next structure mieux une app complète et se déploie facilement.
+- **Zustand plutôt que Redux** : Redux est très puissant mais plus verbeux (actions/reducers/boilerplate). Zustand est simple, suffisant pour l’état global du projet (auth, utilisateur, panier/inscriptions, filtres).
+- **Axios plutôt que fetch “brut”** : `fetch` marche, mais Axios simplifie la config (baseURL), les interceptors (JWT/401), et la gestion d’erreurs uniforme.
+- **Tailwind plutôt que Bootstrap** : Tailwind donne une UI sur-mesure et cohérente sans se battre avec des styles préfaits. Bootstrap va vite aussi, mais on se retrouve souvent avec un rendu “standard” et moins personnalisable.
+- **Framer Motion plutôt que animations CSS dispersées** : c’est plus simple à maintenir, déclaratif, et ça améliore l’UX sans complexité.
+- **date-fns plutôt que Moment.js** : plus moderne et plus léger ; Moment est historique mais lourd et moins recommandé aujourd’hui.
+- **Lucide + clsx** : petits outils qui améliorent la qualité (icônes cohérentes, classes conditionnelles propres) sans alourdir.
+
+### Mobile
+
+- **Expo plutôt que React Native CLI** : Expo fait gagner énormément de temps (outils, démarrage, build). RN CLI donne plus de contrôle natif, mais c’est plus long et plus fragile pour un projet BTS.
+- **React Navigation plutôt que navigation “maison”** : standard du marché, stable, facile à expliquer (stack + tabs).
+- **AsyncStorage plutôt que stockage “en mémoire”** : en mémoire on perd tout au redémarrage ; AsyncStorage permet de garder le token et l’état de connexion.
+- **NativeWind plutôt que styles RN à la main** : plus rapide et cohérent avec le web (même logique Tailwind), donc productivité.
+- **Reanimated plutôt que Animated classique** : meilleures perfs et standard actuel pour des animations fluides.

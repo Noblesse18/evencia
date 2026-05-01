@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #0ea5e9;
+    --accent: #10b981;
+    --danger: #ef4444;
+    --dark: #0f172a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg-soft: #f8fafc;
+    --bg-code: #1e1b4b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 10pt;
+    line-height: 1.65;
+    color: var(--text);
+    background: white;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    page: cover;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(14,165,233,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(99,102,241,0.25);
+    border: 1px solid rgba(99,102,241,0.5);
+    color: #a5b4fc;
+    font-size: 9pt;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 50px;
+    margin-bottom: 30px;
+  }
+
+  .cover h1 {
+    font-size: 48pt;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover h1 span {
+    background: linear-gradient(135deg, #818cf8, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cover-subtitle {
+    font-size: 14pt;
+    color: #94a3b8;
+    font-weight: 300;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #0ea5e9);
+    border-radius: 2px;
+    margin: 0 auto 50px;
+  }
+
+  .cover-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-tag {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #cbd5e1;
+    font-size: 8.5pt;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .cover-meta {
+    position: absolute;
+    bottom: 40px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 50px;
+    color: #475569;
+    font-size: 8.5pt;
+    z-index: 1;
+  }
+
+  .cover-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+  }
+
+  /* ── PAGE SETUP ── */
+  @page {
+    size: A4;
+    margin: 22mm 20mm 22mm 20mm;
+  }
+
+  @page cover {
+    margin: 0;
+  }
+
+  @page content {
+    @bottom-right {
+      content: counter(page);
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+    @bottom-left {
+      content: "Documentation Technique — Evencia";
+      font-family: 'Inter', sans-serif;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+  }
+
+  .content { page: content; }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc {
+    page-break-before: always;
+    padding: 10px 0;
+  }
+
+  .toc-title {
+    font-size: 22pt;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .toc-subtitle {
+    color: var(--muted);
+    font-size: 10pt;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 14px;
+  }
+
+  .toc-num {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 8.5pt;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .toc-text {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 10pt;
+  }
+
+  .toc-dots {
+    flex: 1;
+    border-bottom: 2px dotted #e2e8f0;
+    margin: 0 10px;
+  }
+
+  .toc-page {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 9pt;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    page-break-before: always;
+    padding-top: 8px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20pt;
+    flex-shrink: 0;
+  }
+
+  .section-num {
+    font-size: 8pt;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 2px;
+  }
+
+  .section-title {
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 22px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+  }
+
+  p {
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.7;
+  }
+
+  /* ── TABLES ── */
+  .table-wrap {
+    margin: 16px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+  }
+
+  thead tr {
+    background: linear-gradient(135deg, #0f172a, #1e1b4b);
+  }
+
+  thead th {
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 8.5pt;
+    letter-spacing: 0.5px;
+  }
+
+  thead th:first-child { border-radius: 0; }
+
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:nth-child(odd)  { background: white; }
+  tbody tr:hover           { background: #eff6ff; }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    color: var(--text);
+  }
+
+  td:first-child { font-weight: 500; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--bg-code);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .code-label {
+    font-size: 7.5pt;
+    color: #6366f1;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .code-label::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #6366f1;
+    border-radius: 50%;
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 8pt;
+    line-height: 1.6;
+    color: #e2e8f0;
+    white-space: pre;
+    overflow: hidden;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    color: #6366f1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* ── CARDS & BADGES ── */
+  .info-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+  }
+
+  .info-card.success { border-left-color: var(--accent); background: #f0fdf4; }
+  .info-card.warning { border-left-color: #f59e0b; background: #fffbeb; }
+  .info-card.info    { border-left-color: var(--secondary); background: #f0f9ff; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-green  { background: #dcfce7; color: #15803d; }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+  .badge-purple { background: #ede9fe; color: #7c3aed; }
+  .badge-red    { background: #fee2e2; color: #dc2626; }
+  .badge-gray   { background: #f1f5f9; color: #475569; }
+
+  /* ── TECH GRID ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .tech-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .tech-card-icon { font-size: 22pt; margin-bottom: 6px; }
+  .tech-card-name { font-weight: 600; font-size: 9.5pt; color: var(--dark); }
+  .tech-card-desc { font-size: 8pt; color: var(--muted); margin-top: 3px; }
+
+  /* ── LAYER DIAGRAM ── */
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 16px 0;
+  }
+
+  .layer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .layer-0 { background: #0f172a; color: white; }
+  .layer-1 { background: #1e1b4b; color: #e0e7ff; }
+  .layer-2 { background: #312e81; color: #c7d2fe; }
+  .layer-3 { background: #4338ca; color: #e0e7ff; }
+  .layer-4 { background: #4f46e5; color: white; }
+  .layer-5 { background: #6366f1; color: white; }
+
+  .layer-name { font-weight: 600; font-size: 9.5pt; min-width: 120px; }
+  .layer-desc { font-size: 8.5pt; flex: 1; opacity: 0.85; }
+  .layer-tech { font-size: 7.5pt; font-family: 'JetBrains Mono', monospace; opacity: 0.7; text-align: right; }
+
+  /* ── SECURITY TABLE ── */
+  .security-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .security-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14pt;
+    flex-shrink: 0;
+  }
+
+  .security-name { font-weight: 600; font-size: 9.5pt; color: var(--dark); }
+  .security-desc { font-size: 8.5pt; color: var(--muted); margin-top: 2px; }
+
+  /* ── DOCKER CARDS ── */
+  .docker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .docker-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .docker-card-header {
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 9.5pt;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .docker-mysql  .docker-card-header { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+  .docker-backend .docker-card-header { background: linear-gradient(135deg, #10b981, #059669); }
+  .docker-front  .docker-card-header { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+
+  .docker-card-body { padding: 12px 14px; background: white; }
+  .docker-card-body p { font-size: 8.5pt; color: var(--muted); margin-bottom: 4px; }
+  .docker-card-body strong { color: var(--text); }
+
+  /* ── TEST STATS ── */
+  .test-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .test-stat {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .test-stat-num {
+    font-size: 22pt;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .test-stat-label { font-size: 8pt; color: var(--muted); font-weight: 500; margin-top: 2px; }
+
+  /* ── DIAGRAM IMAGE ── */
+  .diagram-box {
+    background: var(--bg-code);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    overflow: hidden;
+  }
+
+  /* ── ENDPOINT CARDS ── */
+  .endpoint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    font-size: 9pt;
+  }
+
+  .method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .method-get    { background: #d1fae5; color: #065f46; }
+  .method-post   { background: #dbeafe; color: #1e40af; }
+  .method-put    { background: #fef3c7; color: #92400e; }
+  .method-delete { background: #fee2e2; color: #991b1b; }
+
+  .ep-path { font-family: 'JetBrains Mono', monospace; font-size: 8.5pt; color: var(--dark); flex: 1; }
+  .ep-desc { color: var(--muted); font-size: 8.5pt; }
+  .ep-auth { font-size: 7.5pt; }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 8pt;
+  }
+
+  /* ── UTILS ── */
+  ul { padding-left: 18px; margin: 8px 0 12px; }
+  ul li { margin-bottom: 5px; color: var(--text); }
+  strong { font-weight: 600; }
+
+  .highlight { color: var(--primary); font-weight: 600; }
+  .text-muted { color: var(--muted); }
+
+  .page-break { page-break-before: always; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 14px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="cover-badge">BTS SIO · Option SLAM · 2024–2025</div>
+  <h1>Evan<span>cia</span></h1>
+  <p class="cover-subtitle">Documentation Technique Complète</p>
+  <div class="cover-divider"></div>
+  <div class="cover-tags">
+    <span class="cover-tag">⚡ Express.js REST API</span>
+    <span class="cover-tag">⚛️ Next.js 16</span>
+    <span class="cover-tag">📱 React Native / Expo</span>
+    <span class="cover-tag">🐬 MySQL 8.0</span>
+    <span class="cover-tag">🐳 Docker</span>
+    <span class="cover-tag">💳 Stripe</span>
+    <span class="cover-tag">🔐 JWT + bcrypt</span>
+    <span class="cover-tag">☁️ Oracle Cloud</span>
+  </div>
+  <div class="cover-meta">
+    <span class="cover-meta-item">📅 Architecture · BDD · API · Sécurité · Déploiement</span>
+    <span class="cover-meta-item">12 sections · Projet complet full-stack</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ CONTENT -->
+<div class="content">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <div class="toc-title">Sommaire</div>
+  <div class="toc-subtitle">Documentation technique — Application de gestion d'événements Evencia</div>
+
+  <div class="toc-item">
+    <div class="toc-num">1</div>
+    <span class="toc-text">Architecture globale</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">2</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">2</div>
+    <span class="toc-text">Architecture Backend — Couches</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">3</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">3</div>
+    <span class="toc-text">Schéma de la base de données</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">4</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">4</div>
+    <span class="toc-text">Endpoints de l'API REST</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">5</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">5</div>
+    <span class="toc-text">Sécurité</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">6</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">6</div>
+    <span class="toc-text">Conteneurisation Docker</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">7</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">7</div>
+    <span class="toc-text">Architecture Frontend — Next.js 16</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">8</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">8</div>
+    <span class="toc-text">Architecture Mobile — React Native / Expo</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">9</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">9</div>
+    <span class="toc-text">Tests API</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">10</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">10</div>
+    <span class="toc-text">Variables d'environnement</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">11</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">11</div>
+    <span class="toc-text">Choix des dépendances</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">12</span>
+  </div>
+  <div class="toc-item">
+    <div class="toc-num">12</div>
+    <span class="toc-text">Version "oral BTS" — Justification des choix</span>
+    <span class="toc-dots"></span>
+    <span class="toc-page">14</span>
+  </div>
+</div>
+
+<!-- ═══ SECTION 1 — ARCHITECTURE GLOBALE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#6366f1,#0ea5e9);">🏗️</div>
+    <div>
+      <div class="section-num">Section 01</div>
+      <div class="section-title">Architecture globale</div>
+    </div>
+  </div>
+
+  <p>L'application <strong>Evencia</strong> repose sur une <strong>architecture client-serveur découplée</strong> avec trois clients (web, mobile, Swagger) qui communiquent avec une API REST centrale.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-icon">📱</div>
+      <div class="tech-card-name">Application Mobile</div>
+      <div class="tech-card-desc">Expo · React Native · NativeWind</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🌐</div>
+      <div class="tech-card-name">Application Web</div>
+      <div class="tech-card-desc">Next.js 16 · TypeScript · Tailwind CSS 4</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">📄</div>
+      <div class="tech-card-name">Swagger UI</div>
+      <div class="tech-card-desc">Documentation & tests API interactifs</div>
+    </div>
+  </div>
+
+  <div class="diagram-box">
+    <div class="code-label">Schéma d'architecture — Communication HTTP/REST</div>
+    <pre>
+  ┌─────────────────────────────────────────────────────────────┐
+  │                          CLIENTS                            │
+  │                                                             │
+  │  ┌───────────────────┐    ┌─────────────────────────────┐  │
+  │  │  App Mobile        │    │  Application Web             │  │
+  │  │  Expo · RN         │    │  Next.js 16 + TypeScript     │  │
+  │  │  NativeWind        │    │  Zustand + Axios             │  │
+  │  └─────────┬──────────┘    └──────────────┬──────────────┘  │
+  └────────────┼──────────────────────────────┼─────────────────┘
+               │         HTTP / REST           │
+               ▼                              ▼
+  ┌──────────────────────────────────────────────────────────────┐
+  │                    API REST — Express.js                      │
+  │                                                              │
+  │  ┌─────────────┐  ┌────────────┐  ┌──────────────────────┐  │
+  │  │  Middleware  │  │ Controllers│  │ Services / Validators │  │
+  │  │  JWT + Roles │  │ (5 modules)│  │ express-validator     │  │
+  │  │  Rate Limit  │  │            │  │ bcrypt · jsonwebtoken │  │
+  │  │  CORS        │  │            │  │                      │  │
+  │  └──────┬───────┘  └─────┬──────┘  └───────────┬──────────┘  │
+  │         └────────────────┴──────────────────────┘            │
+  │                    Repositories + mysql2 (pool)              │
+  │                    Drizzle ORM (schémas)                     │
+  └───────────────────────────┬──────────────────────────────────┘
+                              │
+                              ▼
+                   ┌─────────────────────┐
+                   │   MySQL 8.0         │
+                   │   Base : evencianew │
+                   │   (Docker volume)   │
+                   └─────────────────────┘</pre>
+  </div>
+
+  <div class="info-card info">
+    <strong>📌 Principe clé :</strong> L'API REST Express.js sert de point d'entrée unique pour tous les clients. Le frontend et le mobile communiquent exclusivement via des requêtes HTTP, garantissant l'indépendance de chaque couche.
+  </div>
+</div>
+
+<!-- ═══ SECTION 2 — BACKEND COUCHES -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#10b981,#0ea5e9);">⚙️</div>
+    <div>
+      <div class="section-num">Section 02</div>
+      <div class="section-title">Architecture Backend — Couches</div>
+    </div>
+  </div>
+
+  <p>Le backend suit une <strong>architecture en couches</strong> strictement séparées par responsabilité. Chaque couche a un rôle précis et communique uniquement avec la couche adjacente.</p>
+
+  <div class="layers">
+    <div class="layer layer-0">
+      <span class="layer-name">🔐 Sécurité</span>
+      <span class="layer-desc">Authentification, autorisation, rate limiting, CORS</span>
+      <span class="layer-tech">JWT · authorizeRoles · express-rate-limit</span>
+    </div>
+    <div class="layer layer-1">
+      <span class="layer-name">🎮 Controllers</span>
+      <span class="layer-desc">Orchestration des requêtes HTTP entrantes</span>
+      <span class="layer-tech">auth · event · user · inscription · payment</span>
+    </div>
+    <div class="layer layer-2">
+      <span class="layer-name">✅ Validators</span>
+      <span class="layer-desc">Validation et assainissement des données entrantes</span>
+      <span class="layer-tech">express-validator</span>
+    </div>
+    <div class="layer layer-3">
+      <span class="layer-name">💼 Services</span>
+      <span class="layer-desc">Logique métier, hashage, tokens, paiements</span>
+      <span class="layer-tech">bcrypt · jwt · Stripe · vérif. places</span>
+    </div>
+    <div class="layer layer-4">
+      <span class="layer-name">🗄️ Repositories</span>
+      <span class="layer-desc">Accès aux données via requêtes paramétrées</span>
+      <span class="layer-tech">BaseRepository · mysql2 pool · UserRepo · EventRepo</span>
+    </div>
+    <div class="layer layer-5">
+      <span class="layer-name">🐬 Base de données</span>
+      <span class="layer-desc">Stockage persistant avec schémas et migrations</span>
+      <span class="layer-tech">MySQL 8.0 · Drizzle ORM · migrations SQL</span>
+    </div>
+  </div>
+
+  <div class="info-card success">
+    <strong>✅ Avantage de cette architecture :</strong> Chaque couche est testable indépendamment. La séparation des responsabilités facilite la maintenance, l'évolution et la détection des bugs.
+  </div>
+</div>
+
+<!-- ═══ SECTION 3 — BASE DE DONNÉES -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#0ea5e9,#6366f1);">🗄️</div>
+    <div>
+      <div class="section-num">Section 03</div>
+      <div class="section-title">Schéma de la base de données</div>
+    </div>
+  </div>
+
+  <p>La base <code>evencianew</code> contient <strong>4 tables principales</strong> reliées par des clés étrangères. Le modèle est entièrement relationnel, adapté aux contraintes du projet (inscriptions uniques, gestion de places, paiements).</p>
+
+  <div class="diagram-box">
+    <div class="code-label">Modèle Entité-Relation — evencianew</div>
+    <pre>
+  ┌────────────────────────┐       ┌──────────────────────────────┐
+  │        USERS           │       │           EVENTS             │
+  ├────────────────────────┤       ├──────────────────────────────┤
+  │ id         VARCHAR(36) │◄──┐   │ id          VARCHAR(36)  PK  │
+  │ name       VARCHAR(100)│   │   │ title       VARCHAR(200)     │
+  │ email      VARCHAR(100)│UK │   │ description TEXT             │
+  │ password   VARCHAR(255)│   │   │ category    VARCHAR(100)     │
+  │ role       ENUM        │   │   │ location    VARCHAR(200)     │
+  │  (participant,         │   │   │ event_date  DATETIME         │
+  │   organizer, admin)    │   │   │ price       DECIMAL(10,2)    │
+  │ created_at TIMESTAMP   │   └───│ organizer_id VARCHAR(36) FK  │
+  │ updated_at TIMESTAMP   │       │ max_tickets INT              │
+  │ last_login TIMESTAMP   │       │ image_url   VARCHAR(500)     │
+  └──────────┬─────────────┘       │ photos      JSON             │
+             │                     └────────────┬─────────────────┘
+             │                                  │
+             │    ┌─────────────────────────┐   │
+             │    │     INSCRIPTIONS         │   │
+             │    ├─────────────────────────┤   │
+             │    │ id       VARCHAR(36) PK  │   │
+             └───►│ user_id  VARCHAR(36) FK  │   │
+                  │ event_id VARCHAR(36) FK  │◄──┘
+                  │ status   ENUM            │
+                  │  (pending,confirmed,     │
+                  │   cancelled)             │
+                  │ UNIQUE(user_id, event_id)│
+                  └────────────┬────────────┘
+                               │ 1
+                               │ 0..1
+                  ┌────────────▼────────────┐
+                  │        PAYMENTS          │
+                  ├─────────────────────────┤
+                  │ id                  PK  │
+                  │ user_id         FK→users │
+                  │ event_id       FK→events │
+                  │ amount        DECIMAL    │
+                  │ status        VARCHAR    │
+                  │ stripe_payment_intent_id │ UK
+                  │ stripe_customer_id       │
+                  │ card_last4   VARCHAR(4)  │
+                  │ card_brand   VARCHAR     │
+                  └─────────────────────────┘</pre>
+  </div>
+
+  <h3>Relations entre les tables</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Relation</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>users → events</td><td><span class="badge badge-blue">1 → N</span></td><td>Un organisateur crée plusieurs événements</td></tr>
+        <tr><td>users → inscriptions</td><td><span class="badge badge-blue">1 → N</span></td><td>Un utilisateur s'inscrit à plusieurs événements</td></tr>
+        <tr><td>events → inscriptions</td><td><span class="badge badge-blue">1 → N</span></td><td>Un événement a plusieurs inscrits</td></tr>
+        <tr><td>inscriptions → payments</td><td><span class="badge badge-purple">1 → 0..1</span></td><td>Une inscription peut avoir un paiement associé</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4 — ENDPOINTS API -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#f59e0b,#ef4444);">🔌</div>
+    <div>
+      <div class="section-num">Section 04</div>
+      <div class="section-title">Endpoints de l'API REST</div>
+    </div>
+  </div>
+
+  <div class="info-card info">
+    <strong>📖 Documentation interactive :</strong> La documentation Swagger complète est accessible à <code>http://localhost:5000/api-docs</code> — elle permet de tester tous les endpoints directement depuis le navigateur.
+  </div>
+
+  <h3>Authentification — /api/auth</h3>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/auth/register</span><span class="ep-desc">Inscription (name, email, password, role)</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/auth/login</span><span class="ep-desc">Connexion → retourne JWT</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/auth/verify</span><span class="ep-desc">Vérification du token JWT</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/auth/change-password</span><span class="ep-desc">Changement de mot de passe</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/auth/request-password-reset</span><span class="ep-desc">Demande de réinitialisation</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/auth/reset-password</span><span class="ep-desc">Réinitialisation par token</span><span class="badge badge-gray ep-auth">Public</span></div>
+
+  <h3>Utilisateurs — /api/users</h3>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/users/me</span><span class="ep-desc">Mon profil utilisateur</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-put">PUT</span><span class="ep-path">/api/users/me</span><span class="ep-desc">Modifier mon profil</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/users/</span><span class="ep-desc">Liste de tous les utilisateurs</span><span class="badge badge-red ep-auth">Admin</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/users/:id</span><span class="ep-desc">Détail d'un utilisateur</span><span class="badge badge-green ep-auth">Auth</span></div>
+
+  <h3>Événements — /api/events</h3>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/events</span><span class="ep-desc">Lister (filtres, recherche, pagination)</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/events/:id</span><span class="ep-desc">Détail d'un événement</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/events/categories</span><span class="ep-desc">Liste des catégories</span><span class="badge badge-gray ep-auth">Public</span></div>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/events/organizer/my-events</span><span class="ep-desc">Mes événements</span><span class="badge badge-purple ep-auth">Organizer</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/events</span><span class="ep-desc">Créer un événement</span><span class="badge badge-purple ep-auth">Org/Admin</span></div>
+  <div class="endpoint"><span class="method method-put">PUT</span><span class="ep-path">/api/events/:id</span><span class="ep-desc">Modifier un événement</span><span class="badge badge-purple ep-auth">Org/Admin</span></div>
+  <div class="endpoint"><span class="method method-delete">DELETE</span><span class="ep-path">/api/events/:id</span><span class="ep-desc">Supprimer un événement</span><span class="badge badge-red ep-auth">Org/Admin</span></div>
+
+  <h3>Inscriptions — /api/inscriptions</h3>
+  <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/api/inscriptions/my</span><span class="ep-desc">Mes inscriptions</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/inscriptions</span><span class="ep-desc">S'inscrire à un événement</span><span class="badge badge-blue ep-auth">Participant</span></div>
+  <div class="endpoint"><span class="method method-delete">DELETE</span><span class="ep-path">/api/inscriptions/:id</span><span class="ep-desc">Annuler une inscription</span><span class="badge badge-blue ep-auth">Participant</span></div>
+
+  <h3>Paiements — /api/payments</h3>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/payments</span><span class="ep-desc">Créer une session Stripe Checkout</span><span class="badge badge-green ep-auth">Auth</span></div>
+  <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/api/payments/webhook</span><span class="ep-desc">Webhook Stripe (confirmation)</span><span class="badge badge-gray ep-auth">Stripe</span></div>
+</div>
+
+<!-- ═══ SECTION 5 — SÉCURITÉ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#ef4444,#f59e0b);">🔐</div>
+    <div>
+      <div class="section-num">Section 05</div>
+      <div class="section-title">Sécurité</div>
+    </div>
+  </div>
+
+  <div class="security-item">
+    <div class="security-icon">🔑</div>
+    <div><div class="security-name">Hashage des mots de passe</div><div class="security-desc">bcrypt avec salt factor 10 — résistant aux attaques par dictionnaire et brute force</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">🎫</div>
+    <div><div class="security-name">Authentification JWT</div><div class="security-desc">jsonwebtoken avec expiration 7 jours — stateless, adapté aux architectures multi-clients</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">👮</div>
+    <div><div class="security-name">Autorisation par rôles</div><div class="security-desc">Middleware authorizeRoles('participant', 'organizer', 'admin') — contrôle fin des accès</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">✅</div>
+    <div><div class="security-name">Validation des entrées</div><div class="security-desc">express-validator — email, longueur min/max, regex mot de passe — avant toute logique métier</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">🛡️</div>
+    <div><div class="security-name">Protection brute force</div><div class="security-desc">express-rate-limit — 100 req/min global, 5 req/min sur /auth spécifiquement</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">🌐</div>
+    <div><div class="security-name">CORS restreint</div><div class="security-desc">Origines restreintes via variable CORS_ORIGINS — protection contre les requêtes cross-origin non autorisées</div></div>
+  </div>
+  <div class="security-item">
+    <div class="security-icon">🗄️</div>
+    <div><div class="security-name">Requêtes SQL sécurisées</div><div class="security-desc">Requêtes paramétrées via mysql2 — protection contre l'injection SQL</div></div>
+  </div>
+
+  <h3>Flux d'authentification JWT</h3>
+  <div class="diagram-box">
+    <div class="code-label">Séquence Login → Token → Accès API</div>
+    <pre>
+  Client                      API Express                   MySQL
+    │                              │                            │
+    │── POST /api/auth/login ─────►│                            │
+    │   { email, password }        │── SELECT user WHERE email ►│
+    │                              │◄── user row ───────────────│
+    │                              │                            │
+    │                              │  bcrypt.compare(password,  │
+    │                              │    user.password_hash)     │
+    │                              │                            │
+    │                              │  jwt.sign({ id, role },    │
+    │                              │    JWT_SECRET, "7d")       │
+    │                              │                            │
+    │◄── { token, user } ─────────│                            │
+    │                              │                            │
+    │── GET /api/events ──────────►│                            │
+    │   Authorization: Bearer xxx  │  authenticateToken()       │
+    │                              │  jwt.verify(token, secret) │
+    │                              │  authorizeRoles()          │
+    │◄── { events: [...] } ───────│                            │</pre>
+  </div>
+</div>
+
+<!-- ═══ SECTION 6 — DOCKER -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#0ea5e9,#0284c7);">🐳</div>
+    <div>
+      <div class="section-num">Section 06</div>
+      <div class="section-title">Conteneurisation Docker</div>
+    </div>
+  </div>
+
+  <h3>Environnement local — docker-compose.yml</h3>
+  <p>3 services orchestrés avec dépendances et healthchecks :</p>
+
+  <div class="docker-grid">
+    <div class="docker-card docker-mysql">
+      <div class="docker-card-header">🐬 MySQL</div>
+      <div class="docker-card-body">
+        <p><strong>Image :</strong> mysql:8.0</p>
+        <p><strong>Port :</strong> 3307 → 3306</p>
+        <p>Volume persistant, migrations SQL automatiques, healthcheck intégré</p>
+      </div>
+    </div>
+    <div class="docker-card docker-backend">
+      <div class="docker-card-header">⚡ Backend</div>
+      <div class="docker-card-body">
+        <p><strong>Image :</strong> Node 20 Alpine</p>
+        <p><strong>Port :</strong> 5000</p>
+        <p>Dépend de mysql (healthy), injection des variables d'environnement</p>
+      </div>
+    </div>
+    <div class="docker-card docker-front">
+      <div class="docker-card-header">⚛️ Frontend</div>
+      <div class="docker-card-body">
+        <p><strong>Image :</strong> Next.js 16</p>
+        <p><strong>Port :</strong> 3000</p>
+        <p>Build multi-stage optimisé, dépend du backend</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Environnement production — docker-compose.prod.yml</h3>
+  <p>5 services (les 3 ci-dessus + Nginx + Certbot) :</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Service</th><th>Rôle</th><th>Détail</th></tr></thead>
+      <tbody>
+        <tr><td>nginx</td><td>Reverse proxy</td><td>Ports 80/443, routage <code>/api</code> → backend, <code>/</code> → frontend</td></tr>
+        <tr><td>certbot</td><td>SSL automatique</td><td>Certificat Let's Encrypt, renouvellement automatique</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="two-col">
+    <div class="info-card info">
+      <strong>☁️ Hébergement :</strong> Oracle Cloud Free Tier — VM ARM, 4 CPU, 24 Go RAM
+    </div>
+    <div class="info-card success">
+      <strong>🌐 Domaine :</strong> evencia.duckdns.org — sous-domaine DuckDNS gratuit avec HTTPS
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 7 — FRONTEND -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#6366f1,#8b5cf6);">⚛️</div>
+    <div>
+      <div class="section-num">Section 07</div>
+      <div class="section-title">Architecture Frontend — Next.js 16</div>
+    </div>
+  </div>
+
+  <div class="diagram-box">
+    <div class="code-label">Structure de l'Application Web — App Router</div>
+    <pre>
+  Application Web — Next.js 16 (React 19)
+
+  Pages (App Router)
+  ├── /               Page d'accueil (événements mis en avant)
+  ├── /events         Liste avec filtres, recherche, pagination
+  ├── /events/[id]    Détail + inscription + paiement Stripe
+  ├── /events/create  Création d'événement (organizer/admin)
+  ├── /dashboard      Tableau de bord organisateur
+  ├── /profile        Profil utilisateur
+  ├── /auth/login     Connexion
+  └── /auth/register  Inscription
+
+  Components Layer
+  ├── Navbar, Footer, EventCard, FilterBar
+  ├── ProtectedRoute, DashboardStats
+  └── Composants réutilisables (Button, Card, Input...)
+
+  State Management  →  Zustand 5 (persistance localStorage)
+  API Layer         →  Axios + intercepteur JWT (déco auto sur 401)
+  Style             →  Tailwind CSS 4 + Framer Motion 12 + Lucide React</pre>
+  </div>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-card-icon">⚡</div>
+      <div class="tech-card-name">Next.js 16</div>
+      <div class="tech-card-desc">App Router · SSR/SSG · TypeScript</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🐻</div>
+      <div class="tech-card-name">Zustand 5</div>
+      <div class="tech-card-desc">State management minimal · localStorage</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🎨</div>
+      <div class="tech-card-name">Tailwind CSS 4</div>
+      <div class="tech-card-desc">Classes utilitaires · Design cohérent</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">🎬</div>
+      <div class="tech-card-name">Framer Motion</div>
+      <div class="tech-card-desc">Animations déclaratives · UX fluide</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">📡</div>
+      <div class="tech-card-name">Axios</div>
+      <div class="tech-card-desc">Intercepteurs JWT · Gestion 401</div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-card-icon">💳</div>
+      <div class="tech-card-name">Stripe.js</div>
+      <div class="tech-card-desc">Checkout sécurisé côté navigateur</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 8 — MOBILE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#10b981,#6366f1);">📱</div>
+    <div>
+      <div class="section-num">Section 08</div>
+      <div class="section-title">Architecture Mobile — React Native / Expo</div>
+    </div>
+  </div>
+
+  <div class="diagram-box">
+    <div class="code-label">Structure de l'Application Mobile — Expo SDK 54</div>
+    <pre>
+  Application Mobile — Expo SDK 54 (React Native 0.81)
+
+  Navigation (React Navigation 7)
+  ├── Stack Navigator (Login → Main)
+  └── Bottom Tab Navigator
+      ├── HomeScreen       → Événements à la une
+      ├── SearchScreen     → Recherche + filtres
+      ├── DashboardScreen  → Mes inscriptions
+      └── ProfileScreen    → Mon profil + déconnexion
+          └── EventDetailScreen → Détail + inscription (Stack)
+
+  Context Layer  →  AuthContext (login, logout, token AsyncStorage)
+  API Layer      →  Axios (baseURL: 10.0.2.2:5000/api) + intercepteur JWT
+  Style          →  NativeWind v4 (Tailwind CSS pour React Native)
+  Animations     →  react-native-reanimated 4.1</pre>
+  </div>
+
+  <p>L'application mobile communique avec le <strong>même backend Express.js</strong> que le frontend web — garantissant la cohérence des données et la réutilisation de l'API.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Couche</th><th>Technologie</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td>Navigation</td><td>React Navigation 7</td><td>Stack + BottomTabs, navigation standard</td></tr>
+        <tr><td>Persistance locale</td><td>AsyncStorage</td><td>Token JWT, état de connexion</td></tr>
+        <tr><td>API</td><td>Axios</td><td>Intercepteurs JWT, mêmes patterns que le web</td></tr>
+        <tr><td>Style</td><td>NativeWind v4</td><td>Tailwind CSS adapté React Native</td></tr>
+        <tr><td>Animations</td><td>react-native-reanimated 4.1</td><td>Animations performantes (thread UI)</td></tr>
+        <tr><td>Build/Tooling</td><td>Expo SDK 54</td><td>Tooling, démarrage rapide, OTA updates</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SECTION 9 — TESTS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#f59e0b,#10b981);">🧪</div>
+    <div>
+      <div class="section-num">Section 09</div>
+      <div class="section-title">Tests API</div>
+    </div>
+  </div>
+
+  <p>La collection Postman complète est disponible dans <code>docs/evencia-postman-collection.json</code>.</p>
+
+  <div class="test-stats">
+    <div class="test-stat">
+      <div class="test-stat-num">15</div>
+      <div class="test-stat-label">Tests Auth</div>
+    </div>
+    <div class="test-stat">
+      <div class="test-stat-num">6</div>
+      <div class="test-stat-label">Tests Users</div>
+    </div>
+    <div class="test-stat">
+      <div class="test-stat-num">12</div>
+      <div class="test-stat-label">Tests Events</div>
+    </div>
+    <div class="test-stat">
+      <div class="test-stat-num">33+</div>
+      <div class="test-stat-label">Tests Total</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Catégorie</th><th>Tests</th><th>Scénarios couverts</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Auth</strong></td><td><span class="badge badge-blue">15</span></td><td>Register (participant, organizer, duplicate, missing fields, weak password), Login (success, invalid, missing), Verify token (valid, invalid, missing), Change password, Reset password</td></tr>
+        <tr><td><strong>Users</strong></td><td><span class="badge badge-blue">6</span></td><td>Get profile, Update profile, Get by ID, Not found, Access control (sans auth, non-admin)</td></tr>
+        <tr><td><strong>Events</strong></td><td><span class="badge badge-blue">12</span></td><td>Get categories, Create (free, paid, unauthorized), List (all, filtres, search, pagination), Get by ID, Not found, Update, My events</td></tr>
+        <tr><td><strong>Inscriptions</strong></td><td><span class="badge badge-gray">—</span></td><td>Tests d'inscription, annulation, cas d'erreur (déjà inscrit, complet)</td></tr>
+        <tr><td><strong>Payments</strong></td><td><span class="badge badge-gray">—</span></td><td>Création de session Stripe Checkout</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SECTION 10 — ENV VARS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#475569,#0f172a);">⚙️</div>
+    <div>
+      <div class="section-num">Section 10</div>
+      <div class="section-title">Variables d'environnement</div>
+    </div>
+  </div>
+
+  <div class="info-card warning">
+    <strong>⚠️ Sécurité :</strong> Les valeurs sensibles (<code>JWT_SECRET</code>, <code>STRIPE_SECRET_KEY</code>, <code>DB_PASSWORD</code>) ne doivent jamais être committées dans le dépôt Git. Utiliser un fichier <code>.env</code> local ou les secrets du serveur.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Description</th><th>Valeur par défaut</th></tr></thead>
+      <tbody>
+        <tr><td><code>DB_HOST</code></td><td>Hôte MySQL</td><td>localhost (Docker : mysql)</td></tr>
+        <tr><td><code>DB_PORT</code></td><td>Port MySQL</td><td>3306</td></tr>
+        <tr><td><code>DB_USER</code></td><td>Utilisateur MySQL</td><td>root</td></tr>
+        <tr><td><code>DB_PASSWORD</code></td><td>Mot de passe MySQL</td><td>⚠️ à définir</td></tr>
+        <tr><td><code>DB_NAME</code></td><td>Nom de la base</td><td>evencianew</td></tr>
+        <tr><td><code>JWT_SECRET</code></td><td>Clé secrète JWT</td><td>⚠️ à générer (32+ chars)</td></tr>
+        <tr><td><code>PORT</code></td><td>Port du backend</td><td>5000</td></tr>
+        <tr><td><code>CORS_ORIGINS</code></td><td>Origines autorisées</td><td>http://localhost:3000</td></tr>
+        <tr><td><code>STRIPE_SECRET_KEY</code></td><td>Clé secrète Stripe</td><td>⚠️ mode test sk_test_…</td></tr>
+        <tr><td><code>STRIPE_WEBHOOK_SECRET</code></td><td>Secret webhook Stripe</td><td>⚠️ fourni par Stripe CLI</td></tr>
+        <tr><td><code>FRONTEND_URL</code></td><td>URL du frontend</td><td>http://localhost:3000</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SECTION 11 — DÉPENDANCES -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#8b5cf6,#6366f1);">📦</div>
+    <div>
+      <div class="section-num">Section 11</div>
+      <div class="section-title">Choix des dépendances</div>
+    </div>
+  </div>
+
+  <h3>Backend</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Rôle</th><th>Justification</th></tr></thead>
+      <tbody>
+        <tr><td><code>express</code></td><td>Framework HTTP</td><td>Minimal, très répandu, idéal pour API REST avec middlewares</td></tr>
+        <tr><td><code>mysql2</code></td><td>Driver MySQL</td><td>Performant, pools, requêtes paramétrées (protection SQL)</td></tr>
+        <tr><td><code>drizzle-orm</code></td><td>ORM schémas</td><td>Léger, proche SQL, maîtrise totale sans "magie"</td></tr>
+        <tr><td><code>bcrypt</code></td><td>Hashage mots de passe</td><td>Salt + coût configurable, conçu spécifiquement pour les mots de passe</td></tr>
+        <tr><td><code>jsonwebtoken</code></td><td>JWT</td><td>Authentification stateless, adapté multi-clients</td></tr>
+        <tr><td><code>express-validator</code></td><td>Validation</td><td>Centralisation, pas de duplication dans les controllers</td></tr>
+        <tr><td><code>cors</code></td><td>Contrôle origines</td><td>Protection explicite contre les requêtes non autorisées</td></tr>
+        <tr><td><code>express-rate-limit</code></td><td>Anti brute force</td><td>Limitation débit, protection /auth notamment</td></tr>
+        <tr><td><code>stripe</code></td><td>Paiements</td><td>SDK officiel Stripe, sécurisé, maintenu, conforme</td></tr>
+        <tr><td><code>swagger-jsdoc</code></td><td>Docs API</td><td>Génération OpenAPI depuis JSDoc</td></tr>
+        <tr><td><code>uuid</code></td><td>Identifiants</td><td>IDs non-séquentiels, sûrs à exposer publiquement</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Frontend Web</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td><code>next</code></td><td>Framework React complet (App Router, SSR/SSG, routing, optimisations)</td></tr>
+        <tr><td><code>zustand</code></td><td>State management minimaliste — moins de boilerplate que Redux</td></tr>
+        <tr><td><code>axios</code></td><td>Client HTTP avec intercepteurs JWT et gestion d'erreurs uniforme</td></tr>
+        <tr><td><code>tailwindcss</code></td><td>UI sur-mesure via classes utilitaires, itération rapide</td></tr>
+        <tr><td><code>framer-motion</code></td><td>Animations fluides et déclaratives, améliore l'UX</td></tr>
+        <tr><td><code>lucide-react</code></td><td>Bibliothèque d'icônes moderne, légère et cohérente</td></tr>
+        <tr><td><code>date-fns</code></td><td>Manipulation des dates, plus léger et moderne que Moment.js</td></tr>
+        <tr><td><code>@stripe/stripe-js</code></td><td>Chargement sécurisé de Stripe.js côté navigateur</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mobile</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td><code>expo</code></td><td>Tooling React Native, build, OTA, démarrage rapide sans config native</td></tr>
+        <tr><td><code>@react-navigation</code></td><td>Navigation stack + tabs, standard du marché, stable</td></tr>
+        <tr><td><code>async-storage</code></td><td>Persistance locale du token et des préférences</td></tr>
+        <tr><td><code>nativewind</code></td><td>Tailwind CSS pour RN, cohérent avec le web</td></tr>
+        <tr><td><code>react-native-reanimated</code></td><td>Animations performantes sur le thread UI</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SECTION 12 — ORAL BTS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg,#f59e0b,#ef4444);">🎓</div>
+    <div>
+      <div class="section-num">Section 12</div>
+      <div class="section-title">Version "oral BTS" — Justification des choix</div>
+    </div>
+  </div>
+
+  <div class="info-card warning">
+    <strong>🎯 Objectif à l'oral :</strong> Montrer que les choix sont <strong>cohérents</strong>, <strong>réalistes</strong>, et adaptés au profil BTS (aller vite, rester robuste, éviter la sur-architecture).
+  </div>
+
+  <h3>Backend (API)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Choix retenu</th><th>Alternative écartée</th><th>Pourquoi ce choix ?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Express</strong></td><td>NestJS · Spring</td><td>Plus simple et rapide. NestJS apporte une structure "entreprise" mais plus long à configurer. Spring trop lourd pour ce besoin.</td></tr>
+        <tr><td><strong>MySQL</strong></td><td>MongoDB · PostgreSQL</td><td>Modèle relationnel clair (users, events, inscriptions, payments). MySQL très courant, simple à héberger. MongoDB moins naturel avec beaucoup de relations.</td></tr>
+        <tr><td><strong>Drizzle ORM</strong></td><td>Prisma · Sequelize</td><td>Léger, proche du SQL, maîtrise totale. Prisma plus "magique" (plus dur à expliquer à l'oral). Sequelize plus ancien et verbeux.</td></tr>
+        <tr><td><strong>JWT</strong></td><td>Sessions serveur</td><td>Pratique pour plusieurs clients (web + mobile) sans stocker de session côté serveur. Les sessions demanderaient Redis/DB supplémentaire.</td></tr>
+        <tr><td><strong>bcrypt</strong></td><td>SHA-256</td><td>SHA-256 n'est pas fait pour les mots de passe (trop rapide). bcrypt est conçu pour ça (salt + coût configurable).</td></tr>
+        <tr><td><strong>Swagger</strong></td><td>PDF · Notion</td><td>Swagger permet de tester l'API en direct — bien plus parlant à l'oral.</td></tr>
+        <tr><td><strong>Stripe SDK</strong></td><td>Paiement maison</td><td>Solution reconnue et sécurisée. Un paiement "maison" est risqué et irréaliste en production.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Frontend Web</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Choix retenu</th><th>Alternative écartée</th><th>Pourquoi ce choix ?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Next.js</strong></td><td>React + Vite "pur"</td><td>Next apporte le routing, les optimisations et un cadre clair (App Router). Se déploie facilement sur Vercel/Docker.</td></tr>
+        <tr><td><strong>Zustand</strong></td><td>Redux</td><td>Redux très verbeux (actions/reducers/boilerplate). Zustand simple et suffisant pour auth, utilisateur, filtres.</td></tr>
+        <tr><td><strong>Axios</strong></td><td>fetch natif</td><td>fetch marche, mais Axios simplifie la config (baseURL), les interceptors (JWT/401) et la gestion d'erreurs.</td></tr>
+        <tr><td><strong>Tailwind</strong></td><td>Bootstrap</td><td>UI sur-mesure et cohérente. Bootstrap donne un rendu "standard" et moins personnalisable.</td></tr>
+        <tr><td><strong>date-fns</strong></td><td>Moment.js</td><td>Plus moderne et léger. Moment est historique mais lourd et moins recommandé aujourd'hui.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mobile</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Choix retenu</th><th>Alternative écartée</th><th>Pourquoi ce choix ?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Expo</strong></td><td>React Native CLI</td><td>Expo fait gagner énormément de temps (outils, démarrage, build). RN CLI donne plus de contrôle mais plus long et fragile pour un projet BTS.</td></tr>
+        <tr><td><strong>React Navigation</strong></td><td>Navigation maison</td><td>Standard du marché, stable, facile à expliquer (stack + tabs).</td></tr>
+        <tr><td><strong>AsyncStorage</strong></td><td>Stockage en mémoire</td><td>En mémoire on perd tout au redémarrage. AsyncStorage garde le token et l'état de connexion.</td></tr>
+        <tr><td><strong>NativeWind</strong></td><td>Styles RN manuels</td><td>Plus rapide et cohérent avec le web (même logique Tailwind), donc meilleure productivité.</td></tr>
+        <tr><td><strong>Reanimated</strong></td><td>Animated classique</td><td>Meilleures performances et standard actuel pour des animations fluides sur mobile.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-footer">
+    Documentation Technique — Evencia · BTS SIO SLAM · 2024–2025 · Généré automatiquement
+  </div>
+</div>
+
+</div><!-- end .content -->
+</body>
+</html>
