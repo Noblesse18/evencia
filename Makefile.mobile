@@ -1,0 +1,48 @@
+# Makefile.mobile - Lancement backend + émulateur Android + Expo
+# Usage: make -f Makefile.mobile [cible]
+
+.PHONY: help all backend emulator scrcpy expo stop stripe
+
+AVD_NAME ?= Pixel_9
+
+help:
+	@echo "Evencia Mobile - Commandes disponibles:"
+	@echo ""
+	@echo "  make -f Makefile.mobile all        - Tout lancer (backend + émulateur + scrcpy + expo)"
+	@echo "  make -f Makefile.mobile backend    - Démarrer le backend + BDD (Docker)"
+	@echo "  make -f Makefile.mobile emulator   - Lancer l'émulateur Android"
+	@echo "  make -f Makefile.mobile scrcpy     - Afficher l'écran de l'émulateur"
+	@echo "  make -f Makefile.mobile expo       - Lancer Expo (app mobile)"
+	@echo "  make -f Makefile.mobile stripe     - Lancer le listener Stripe webhook"
+	@echo "  make -f Makefile.mobile stop       - Arrêter le backend Docker"
+	@echo "  make -f Makefile.mobile devices    - Vérifier les appareils connectés"
+	@echo ""
+
+all: backend emulator-wait scrcpy expo
+
+backend:
+	docker compose up --build -d backend mysql
+
+stop:
+	docker compose down
+
+emulator:
+	emulator -avd $(AVD_NAME) -no-snapshot-load -qt-hide-window -no-skin &
+
+emulator-wait: emulator
+	@echo "Attente du démarrage de l'émulateur..."
+	@adb wait-for-device
+	@adb shell getprop sys.boot_completed | grep -q 1 || sleep 5
+	@echo "Émulateur prêt."
+
+scrcpy:
+	scrcpy &
+
+expo:
+	cd mobile && npx expo start
+
+stripe:
+	stripe listen --forward-to localhost:5000/api/payments/webhook
+
+devices:
+	adb devices

@@ -286,3 +286,40 @@ S'assurer que l'émulateur est démarré avant d'appuyer sur `a` :
 adb devices
 # Doit afficher : emulator-5554   device
 ```
+
+## 6. Makefile Mobile (backend + émulateur + Expo)
+
+Un fichier `Makefile.mobile` à la racine permet de lancer uniquement le backend et l'app mobile (sans le frontend web).
+
+### Commandes disponibles
+
+| Commande | Description |
+|----------|-------------|
+| `make -f Makefile.mobile all` | Tout lancer (backend + émulateur + scrcpy + expo) |
+| `make -f Makefile.mobile backend` | Démarrer le backend + BDD (Docker) |
+| `make -f Makefile.mobile emulator` | Lancer l'émulateur Android |
+| `make -f Makefile.mobile scrcpy` | Afficher l'écran de l'émulateur |
+| `make -f Makefile.mobile expo` | Lancer Expo (app mobile) |
+| `make -f Makefile.mobile stripe` | Lancer le listener Stripe webhook |
+| `make -f Makefile.mobile stop` | Arrêter le backend Docker |
+| `make -f Makefile.mobile devices` | Vérifier les appareils connectés |
+
+### Changer l'AVD
+
+Par défaut l'émulateur utilise `Pixel_9`. Pour un autre AVD :
+
+```bash
+AVD_NAME=MonAutreAvd make -f Makefile.mobile emulator
+```
+
+### Lancement rapide complet
+
+```bash
+make -f Makefile.mobile all
+```
+
+Cela lance dans l'ordre :
+1. Le backend + MySQL via Docker
+2. L'émulateur Android (attend qu'il soit prêt)
+3. scrcpy pour afficher l'écran
+4. Expo pour l'app mobile
